@@ -452,7 +452,7 @@ export const wordRate = {
     normal: 60,
     easys: 70,
     normals: 90,
-    hard: 100,
+    hards: 100,
 
     uppercaseFirst: 5,
     uppercase: 7,

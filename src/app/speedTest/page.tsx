@@ -123,7 +123,8 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const wordDebounce = useDebounce(typingWord, 10);
   const [prevDebounce, setPrevDebounce] = React.useState("");
   const [failCount, setFailCount] = React.useState(0);
-  const [time, setTime] = React.useState(0);
+  const [initTime, setInitTime] = React.useState(30);
+  const [time, setTime] = React.useState(initTime);
   const [isNextWord, setIsNextWord] = React.useState(false);
   const [isTyping, setIsTyping] = React.useState(false);
   const [isShowScore, setIsShowScore] = React.useState(false);
@@ -141,7 +142,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
     inputRef.current?.removeAttribute("disabled");
     setParagraphs("");
     setUserInput("");
-    setTime(60);
+    setTime(initTime);
     setWordIndex(0);
     setFailCount(0);
     setIsTyping(false);
@@ -149,9 +150,25 @@ const SpeedTest = (props: ISpeedTestProps) => {
     inputRef.current?.focus();
   };
 
+  const startTyping = () => {
+    setIsTyping(true);
+    intervalRef.current = setInterval(() => {
+      setTime((prev) => {
+        if (!prev) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          return 0;
+        } else {
+          return prev - 1;
+        }
+      });
+    }, 1000);
+  };
+
   const onType = (value: string) => {
     if (!isTyping) startTyping();
+
     setTypingWord(value);
+
     if (value.slice(-1) === " " || value.slice(-1) === "\n") {
       setUserInput((prev) => prev + value.slice(0, value.length - 1) + " ");
       setWordIndex(wordIndex + 1);
@@ -162,70 +179,68 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const caculScore = () => {
     let charFail = failCount;
     let wordFail = 0;
-    paragraphsArray.map((word, index) => {
+
+    const typedWordArray = paragraphsArray.slice(0, wordIndex - 1);
+    const typedWord = typedWordArray.join("");
+    typedWordArray.map((word, index) => {
       if (word !== userInputArray[index]) {
         charFail += word.length;
         wordFail += 1;
       }
     });
-    charFail = Math.min(charFail, paragraphs.length);
-    const wpm = Math.floor(paragraphsArray.length / (time / 60));
-    const cpm = Math.floor((paragraphs.length / time) * 60);
+    charFail = Math.min(charFail, typedWord.length);
+    const wpm = Math.floor(typedWordArray.length / (initTime / 60));
+    const cpm = Math.floor((typedWord.length / initTime) * 60);
     const wAccuracy =
       Math.floor(
-        ((paragraphsArray.length - wordFail) / paragraphsArray.length) * 10000
+        ((typedWordArray.length - wordFail) / typedWordArray.length) * 10000
       ) / 100;
     const cAccuracy =
-      Math.floor(((paragraphs.length - charFail) / paragraphs.length) * 10000) /
+      Math.floor(((typedWord.length - charFail) / typedWord.length) * 10000) /
       100;
     const score =
       Math.floor(
         Math.sqrt(
-          (paragraphs.length *
-            (paragraphs.length - failCount) *
+          (typedWord.length *
+            (typedWord.length - failCount) *
             wAccuracy *
             cAccuracy) /
-            (time || 1)
+            (initTime || 1)
         )
       ) / 10;
     setResult({ wpm, cpm, wAccuracy, cAccuracy, score });
   };
 
-  const startTyping = () => {
-    setIsShowScore(false);
-    setIsTyping(true);
-    intervalRef.current = setInterval(() => {
-      setTime((prev) => {
-        if (!prev) {
-          finishTyping();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const finishTyping = () => {
+  const finishType = () => {
+    setIsTyping(false);
     caculScore();
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+
     inputRef.current?.setAttribute("disabled", "disabled");
+
     setIsShowScore(true);
   };
 
   const getWord = () => {
-    const type = "basic";
+    const type = "basic"; //basic normal extreme master
     //type này sẽ lấy từ settings
 
     let addWord = "";
-    console.log("ua gi do");
-    while (addWord.split(" ").length < 100) {
+    while (addWord.split(" ").length < 10) {
       const gacha = Math.floor(Math.random() * 100);
       let wordType = "";
-      Object.entries(wordRate[type]).map(([key, value]) => {
-        if (value >= gacha) wordType = key;
-      });
+      const selectedWordType = Object.entries(wordRate[type]).find(
+        ([key, value]) => {
+          return value >= gacha;
+        }
+      );
+
+      if (selectedWordType) wordType = selectedWordType[0];
+
+      console.log("wordType :>> ", wordType);
 
       const wordLib = words.vi?.[wordType] || [];
 
@@ -236,25 +251,35 @@ const SpeedTest = (props: ISpeedTestProps) => {
       else {
         addWord += " " + wordLib[wordIndex];
       }
-      console.log(addWord);
+      console.log(
+        "wordType, wordLib[wordIndex] :>> ",
+        wordType,
+        wordLib[wordIndex]
+      );
     }
 
     return addWord.trim();
   };
 
-  console.log("paragraphArray, paragraphs", paragraphsArray, paragraphs);
   React.useEffect(() => {
-    console.log("vao day");
+    if (isTyping && !time) {
+      finishType();
+    }
+  }, [time, isTyping]);
+
+  React.useEffect(() => {
     if (paragraphsArray.length <= wordIndex + 50) {
-      console.log("vao cho nay");
       const addText = getWord();
-      console.log("addText", addText);
-      setParagraphs(addText);
+      setParagraphs((prev) => {
+        if (prev) return prev + " " + addText;
+        else return addText;
+      });
     }
   }, [paragraphsArray, wordIndex]);
 
   React.useEffect(() => {
     setPrevDebounce(wordDebounce);
+
     if (isTyping) {
       if (isNextWord) return setIsNextWord(false);
       if (prevDebounce.length > wordDebounce.length) {
@@ -264,7 +289,6 @@ const SpeedTest = (props: ISpeedTestProps) => {
   }, [wordDebounce]);
 
   React.useEffect(() => {
-    if (wordIndex > paragraphsArray.length - 1) finishTyping();
     setTypingWord("");
     scrollToId("char-" + wordIndex);
   }, [wordIndex]);
@@ -316,6 +340,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
         <p>Ban da go:</p>
         <p>{userInput}</p>
         {result.wpm}
+        {failCount}
       </div>
     </div>
   );
