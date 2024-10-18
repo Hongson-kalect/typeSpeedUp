@@ -3,6 +3,8 @@ import * as React from "react";
 import { scrollToId } from "../libs/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { wordRate, words } from "./utils/const";
+import { CiEdit } from "react-icons/ci";
+import { GrPowerReset } from "react-icons/gr";
 
 export interface ISpeedTestProps {}
 
@@ -308,7 +310,84 @@ const SpeedTest = (props: ISpeedTestProps) => {
   }, []);
 
   return (
-    <div className="shadow shadow-gray-700 p-4 flex-1">
+    <div className="shadow shadow-gray-700 p-4 flex-1 px-6 overflow-auto">
+      <h2 className="text-3xl font-bold mt-4">Kiểm tra tốc độ gõ</h2>
+
+      <div
+        className="bg-white px-6 py-5 rounded-lg mt-4"
+        style={{ border: "2px solid #D8D8D8" }}
+      >
+        <div className="flex gap-2 items-center">
+          <p className="text-gray-600">Tiếng Việt</p>
+          <CiEdit size={18} />
+        </div>
+
+        <div className="h-[120px] overflow-hidden bg-[#f8f8f8] px-4 py-3 rounded-lg  shadow-sm shadow-gray-300 relative">
+          <div
+            className="line-clamp-3 text-2xl flex flex-wrap"
+            style={{ wordSpacing: "8px" }}
+          >
+            {paragraphsArray.map((item, index) => (
+              <div
+                id={"char-" + index}
+                className={`px-1.5 text-2xl h-9 pt-1 inline rounded-lg ${
+                  wordIndex === index ? "bg-yellow-300 text-white" : ""
+                } ${
+                  userInputArray[index] !== undefined
+                    ? userInputArray[index] !== item
+                      ? "text-red-400"
+                      : "text-green-600"
+                    : ""
+                }`}
+                // style={{ lineHeight: "40px" }}
+                key={index}
+              >
+                {index === wordIndex ? (
+                  <p className="relative inline">
+                    {item.split("").map((char, charIndex) => (
+                      <span
+                        className={` ${
+                          typingWord?.[charIndex] === undefined
+                            ? "text-black"
+                            : typingWord?.[charIndex] !== char
+                            ? "text-red-500"
+                            : "text-green-600"
+                        }`}
+                        key={charIndex}
+                      >
+                        {char}
+                      </span>
+                    ))}
+                    <p className="text-center px-4 mx-auto rounded-xl absolute z-10 text-3xl  -bottom-12 bg-black text-white">
+                      {typingWord}
+                    </p>
+                  </p>
+                ) : (
+                  item
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="absolute top-14 right-0 left-0 h-16 bg-[#ffffffaa]"></div>
+        </div>
+
+        <div className="flex gap-8 items-center mt-6">
+          <textarea
+            value={typingWord}
+            onChange={(e) => onType(e.target.value)}
+            className="text-center font-bold outline-none rounded-xl resize-none h-12 text-[#0C3690] !border-[#0C3690] flex items-center justify-center text-xl"
+            rows={1}
+            style={{ border: "2px solid #0C3690", lineHeight: "44px" }}
+          />
+
+          <button className="text-white flex h-12 rounded-lg bg-green-500 items-center px-4 gap-3">
+            <GrPowerReset size={20} />
+            <p>reset</p>
+          </button>
+        </div>
+      </div>
+
       <Timer time={time} />
       <Paragraphs
         paragraphsArray={paragraphsArray}
