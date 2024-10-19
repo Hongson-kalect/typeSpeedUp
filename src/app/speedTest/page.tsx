@@ -3,8 +3,10 @@ import * as React from "react";
 import { scrollToId } from "../libs/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { wordRate, words } from "./utils/const";
-import { CiEdit } from "react-icons/ci";
+import { CiEdit, CiSettings } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
+import { IoSettingsOutline } from "react-icons/io5";
+import { RiTimerLine } from "react-icons/ri";
 
 export interface ISpeedTestProps {}
 
@@ -21,7 +23,6 @@ const Timer = ({ time }) => {
       .padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
   return (
     <div className="flex items-center gap-2">
-      <p>Time: </p>
       <p id="time">{formatTime(time)}</p>
     </div>
   );
@@ -77,39 +78,157 @@ const Paragraphs = ({
   </div>
 );
 
-const Score = ({ result }) => (
-  <div className="mt-4" id="type-score">
-    <p>Kết quả của bạn là:</p>
-    <div className="flex gap-8 items-center">
-      <div>
-        <div className="flex gap-2 items-center">
-          <div className="text-sm text-gray-600">WPM: </div>
-          <p className="text-lg font-medium text-green-700">{result.wpm}</p>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="text-sm text-gray-600">CPM: </div>
-          <p className="text-lg font-medium text-green-700">{result.cpm}</p>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="text-sm text-gray-600">Word Accurate: </div>
-          <p className="text-lg font-medium text-green-700">
-            {result.wAccuracy}%
+const Result = ({ result }) => (
+  <div
+    className="mt-8 bg-white rounded-lg px-6 py-4 flex gap-4"
+    id="type-score"
+    style={{ border: "1px solid #ddd" }}
+  >
+    <div className="flex-2">
+      <h2 className=" text-orange-500 font-bold text-2xl">KẾT QUẢ</h2>
+      <div className="detail flex flex-wrap gap-[20%] mt-4 pl-4 max-w-[360px]">
+        <div className="w-2/5">
+          <p className="text-sm text-gray-600 mt-3">Word Per Minute</p>
+          <p className="font-semibold text-3xl mt-2 text-center">
+            {result.wpm || 0}
           </p>
         </div>
-        <div className="flex gap-2 items-center">
-          <div className="text-sm text-gray-600">Char Accurate: </div>
-          <p className="text-lg font-medium text-green-700">
-            {result.cAccuracy}%
+        <div className="w-2/5">
+          <p className="text-sm text-gray-600 mt-3">Char Per Minute</p>
+          <p className="font-semibold text-3xl mt-2 text-center">
+            {result.cpm || 0}
+          </p>
+        </div>
+        <div className="w-2/5">
+          <p className="text-sm text-gray-600 mt-3">Word Accuracy Rate</p>
+          <p className="font-medium text-xl italic mt-2 text-center">
+            {result.wa || 0}%
+          </p>
+        </div>
+        <div className="w-2/5">
+          <p className="text-sm text-gray-600 mt-3">Char Accuracy Rate</p>
+          <p className="font-medium text-xl italic mt-2 text-center">
+            {result.ca || 0}%
           </p>
         </div>
       </div>
-      <div className="w-32 text-center">
-        <div className="text-gray-600 text-left"> Điểm số:</div>
-        <div className="text-5xl mt-4">{result.score}</div>
+    </div>
+    <div
+      className="flex-1 flex flex-col pl-4"
+      style={{ borderLeft: "1px solid #ddd" }}
+    >
+      <h2 className=" text-blue-500 font-bold text-2xl">ĐIỂM</h2>
+      <div className="flex flex-col items-center justify-center flex-1">
+        <p className="point text-5xl font-bold">{result.score}</p>
+        <p className="point text-xl text-cyan-500 italic font-bold mt-6">
+          Excelent
+        </p>
       </div>
+    </div>
+    <div className="flex-1">
+      {/* <h2 className=" text-blue-500 font-bold text-2xl">ĐIỂM</h2> */}
     </div>
   </div>
 );
+
+const Rank = () => {
+  return (
+    <div
+      className="mt-8 bg-white rounded-lg px-6 py-4 flex gap-4"
+      style={{ border: "1px solid #d5d5d5" }}
+    >
+      <div>
+        <h2 className=" text-gray-700 font-bold text-">XẾP HẠNG</h2>
+        <table className="">
+          <tbody>
+            <tr>
+              <th>User Name</th>
+              <th>WPM</th>
+              <th>CPM</th>
+              <th>WA</th>
+              <th>CR</th>
+              <th>Score</th>
+              <th>Attemp</th>
+              {/* <th>total</th> */}
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+            <tr>
+              <td>Guest</td>
+              <td>82</td>
+              <td>250</td>
+              <td>80.14%</td>
+              <td>78.8%</td>
+              <td>248</td>
+              <td>82</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 const SpeedTest = (props: ISpeedTestProps) => {
   const [paragraphs, setParagraphs] = React.useState("");
@@ -134,9 +253,9 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const [result, setResult] = React.useState({
     wpm: 0,
     cpm: 0,
-    wAccuracy: 0,
-    cAccuracy: 0,
-    score: 0,
+    wa: 0,
+    ca: 0,
+    score: null,
   });
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
@@ -150,6 +269,21 @@ const SpeedTest = (props: ISpeedTestProps) => {
     setIsTyping(false);
     setTypingWord("");
     inputRef.current?.focus();
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // This makes the h to top of window
+    });
+
+    document.getElementById("speed-test-page")?.scrollTo({
+      top: 0,
+      behavior: "smooth", // This makes the scroll top of page
+    });
+
+    document.getElementById("speed-test-page")?.scrollTo({
+      top: 0,
+      behavior: "smooth", // This makes the scroll top of page
+    });
   };
 
   const startTyping = () => {
@@ -193,24 +327,21 @@ const SpeedTest = (props: ISpeedTestProps) => {
     charFail = Math.min(charFail, typedWord.length);
     const wpm = Math.floor(typedWordArray.length / (initTime / 60));
     const cpm = Math.floor((typedWord.length / initTime) * 60);
-    const wAccuracy =
+    const wa =
       Math.floor(
         ((typedWordArray.length - wordFail) / typedWordArray.length) * 10000
       ) / 100;
-    const cAccuracy =
+    const ca =
       Math.floor(((typedWord.length - charFail) / typedWord.length) * 10000) /
       100;
     const score =
       Math.floor(
         Math.sqrt(
-          (typedWord.length *
-            (typedWord.length - failCount) *
-            wAccuracy *
-            cAccuracy) /
+          (typedWord.length * (typedWord.length - failCount) * wa * ca) /
             (initTime || 1)
         )
       ) / 10;
-    setResult({ wpm, cpm, wAccuracy, cAccuracy, score });
+    setResult({ wpm, cpm, wa, ca, score });
   };
 
   const finishType = () => {
@@ -295,10 +426,6 @@ const SpeedTest = (props: ISpeedTestProps) => {
     scrollToId("char-" + wordIndex);
   }, [wordIndex]);
 
-  // React.useEffect(() => {
-  //   resetType();
-  // }, [paragraphs]);
-
   React.useEffect(() => {
     // resetType();
     inputRef.current?.focus();
@@ -310,116 +437,136 @@ const SpeedTest = (props: ISpeedTestProps) => {
   }, []);
 
   return (
-    <div className="shadow shadow-gray-700 p-4 flex-1 px-6 overflow-auto">
+    <div
+      className="shadow shadow-gray-700 p-4 flex-1 px-6 overflow-auto"
+      id="speed-test-page"
+    >
       <h2 className="text-3xl font-bold mt-4">Kiểm tra tốc độ gõ</h2>
 
       <div
-        className="bg-white px-6 py-5 rounded-lg mt-4"
+        className="bg-white px-6 py-5 rounded-lg mt-4 flex gap-4"
         style={{ border: "2px solid #D8D8D8" }}
       >
-        <div className="flex gap-2 items-center">
-          <p className="text-gray-600">Tiếng Việt</p>
-          <CiEdit size={18} />
-        </div>
-
-        <div className="h-[120px] overflow-hidden bg-[#f8f8f8] px-4 py-3 rounded-lg  shadow-sm shadow-gray-300 relative">
-          <div
-            className="line-clamp-3 text-2xl flex flex-wrap"
-            style={{ wordSpacing: "8px" }}
-          >
-            {paragraphsArray.map((item, index) => (
-              <div
-                id={"char-" + index}
-                className={`px-1.5 text-2xl h-9 pt-1 inline rounded-lg ${
-                  wordIndex === index ? "bg-yellow-300 text-white" : ""
-                } ${
-                  userInputArray[index] !== undefined
-                    ? userInputArray[index] !== item
-                      ? "text-red-400"
-                      : "text-green-600"
-                    : ""
-                }`}
-                // style={{ lineHeight: "40px" }}
-                key={index}
-              >
-                {index === wordIndex ? (
-                  <p className="relative inline">
-                    {item.split("").map((char, charIndex) => (
-                      <span
-                        className={` ${
-                          typingWord?.[charIndex] === undefined
-                            ? "text-black"
-                            : typingWord?.[charIndex] !== char
-                            ? "text-red-500"
-                            : "text-green-600"
-                        }`}
-                        key={charIndex}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    <p className="text-center px-4 mx-auto rounded-xl absolute z-10 text-3xl  -bottom-12 bg-black text-white">
-                      {typingWord}
-                    </p>
-                  </p>
-                ) : (
-                  item
-                )}
-              </div>
-            ))}
+        <div className="w-2/3">
+          <div className="flex items-end justify-between">
+            <div className="flex gap-2 items-center">
+              <p className="text-gray-600">Tiếng Việt</p>
+              <CiEdit size={18} />
+            </div>
+            <div className="setting flex items-end gap-1">
+              <IoSettingsOutline size={20} className="text-gray-500 mb-1" />
+              <p className="h-7 rounded-lg mb-0.5 bg-green-500 text-white px-3 flex items-center justify-center">
+                Dễ
+              </p>
+              <RiTimerLine size={20} className="text-gray-500 ml-2 mb-1" />
+              <Timer time={time} />
+            </div>
           </div>
+          <div className="relative">
+            <div
+              className="h-[120px] overflow-y-hidden bg-[#F5F6FA] px-4 pb-3 rounded-lg  shadow-sm shadow-gray-300"
+              style={{ border: "1px solid #d8d8d8" }}
+            >
+              <div
+                className="text-2xl flex flex-wrap overflow-auto"
+                style={{ wordSpacing: "8px" }}
+              >
+                <div id="first-word"></div>
+                {paragraphsArray.map((item, index) => (
+                  <div
+                    id={"char-" + index}
+                    className={`px-1.5 text-2xl h-9 pt-1 inline rounded-lg ${
+                      wordIndex === index ? "bg-yellow-300 text-white" : ""
+                    } ${
+                      userInputArray[index] !== undefined
+                        ? userInputArray[index] !== item
+                          ? "text-red-400"
+                          : "text-green-600"
+                        : ""
+                    }`}
+                    // style={{ lineHeight: "40px" }}
+                    key={index}
+                  >
+                    {index === wordIndex ? (
+                      <p className="relative inline">
+                        {item.split("").map((char, charIndex) => (
+                          <span
+                            className={` ${
+                              typingWord?.[charIndex] === undefined
+                                ? "text-black"
+                                : typingWord?.[charIndex] !== char
+                                ? "text-red-500"
+                                : "text-green-600"
+                            }`}
+                            key={charIndex}
+                          >
+                            {char}
+                          </span>
+                        ))}
+                        {isTyping ? (
+                          <div className=" px-4 mx-auto rounded-xl absolute z-10 text-2xl  top-8 -left-4 bg-black box-content  min-w-full box text-white">
+                            <p className="h-6">
+                              {typingWord}
+                              <span className="text-gray-400">_</span>
+                            </p>
+                            <p className="mt-2 text-center text-gray-500 text-xs">
+                              <span>combo</span>
+                              <span className="text-gray-300">x2</span>
+                            </p>
+                          </div>
+                        ) : null}
+                      </p>
+                    ) : (
+                      item
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="absolute top-10 left-1 right-1 h-[79px] bg-[#f6faffaa]"></div>
+          </div>
+          <div className="flex gap-8 items-center mt-6">
+            <textarea
+              ref={inputRef}
+              spellCheck={false}
+              value={typingWord}
+              onChange={(e) => onType(e.target.value)}
+              className="disabled:bg-gray-200 disabled:text-gray-400 disabled:!border-none  text-center font-bold outline-none rounded-xl resize-none h-12 text-[#0C3690] !border-[#0C3690] flex items-center justify-center text-xl"
+              rows={1}
+              style={{ border: "2px solid #0C3690", lineHeight: "44px" }}
+            />
+            <button
+              className="text-white flex h-12 rounded-lg bg-green-500 items-center px-4 gap-3 relative"
+              onClick={resetType}
+            >
+              <GrPowerReset size={20} />
+              <p>reset</p>
 
-          <div className="absolute top-14 right-0 left-0 h-16 bg-[#ffffffaa]"></div>
+              <p className="absolute text-xs -bottom-4 w-full left-0 text-center text-gray-400">
+                ( F5 )
+              </p>
+            </button>
+          </div>
         </div>
-
-        <div className="flex gap-8 items-center mt-6">
-          <textarea
-            value={typingWord}
-            onChange={(e) => onType(e.target.value)}
-            className="text-center font-bold outline-none rounded-xl resize-none h-12 text-[#0C3690] !border-[#0C3690] flex items-center justify-center text-xl"
-            rows={1}
-            style={{ border: "2px solid #0C3690", lineHeight: "44px" }}
-          />
-
-          <button className="text-white flex h-12 rounded-lg bg-green-500 items-center px-4 gap-3">
-            <GrPowerReset size={20} />
-            <p>reset</p>
-          </button>
+        <div className="flex-1 px-4" style={{ borderLeft: "1px solid #ddd" }}>
+          <p>Bên lưu ghi mấy cái streak, animation, combo các thứ</p>
         </div>
       </div>
 
-      <Timer time={time} />
-      <Paragraphs
-        paragraphsArray={paragraphsArray}
-        userInputArray={userInputArray}
-        wordIndex={wordIndex}
-        typingWord={typingWord}
-      />
-      <div className="flex gap-4 items-center justify-center my-8">
-        <div className="w-122">
-          <textarea
-            ref={inputRef}
-            className="bg-gray-100 disabled:bg-gray-300 rounded-lg w-full text-2xl px-3 py-1 resize-none h-10"
-            style={{ wordSpacing: "6px" }}
-            value={typingWord}
-            onChange={(e) => onType(e.target.value)}
-          />
-        </div>
-        <button
-          className="px-4 py-1 rounded bg-blue-600 text-white text-lg"
-          onClick={resetType}
-        >
-          reset
-        </button>
+      <div className="h-20 flex items-center justify-center mt-8">
+        <div className="h-full w-40 bg-red-300"></div>
       </div>
-      <div className="flex justify-center">
-        {isShowScore ? <Score result={result} /> : null}
+
+      <div className="duration-200" id="type-result">
+        {result.score !== null ? (
+          <div className={`${isTyping ? "opacity-30" : ""}`}>
+            <Result result={result} />
+          </div>
+        ) : null}
       </div>
-      <div className="mt-4">
-        <p>Ban da go:</p>
-        <p>{userInput}</p>
-        {result.wpm}
-        {failCount}
+
+      <div className="" id="type-rank">
+        <Rank />
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ export default function SpeedTestLayout(props: ISpeedTestLayoutProps) {
       <div>
         <SideBar />
       </div>
-      <div className="flex-1 bg-[#F5F6FA]">
+      <div className="flex-1 bg-[#F5F6FA] flex flex-col">
         <Header />
         {props.children}
       </div>
