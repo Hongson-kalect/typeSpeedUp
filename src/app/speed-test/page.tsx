@@ -1,12 +1,13 @@
 "use client";
 import * as React from "react";
-import { scrollToId } from "../libs/utils";
+import { scrollTo, scrollToId } from "../libs/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { wordRate, words } from "./utils/const";
 import { CiEdit, CiSettings } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { RiTimerLine } from "react-icons/ri";
+import { Button } from "@/components/ui/button";
 
 export interface ISpeedTestProps {}
 
@@ -78,36 +79,54 @@ const Paragraphs = ({
   </div>
 );
 
-const Result = ({ result }) => (
+const Result = ({ result, reset }) => (
   <div
-    className="mt-8 bg-white rounded-lg px-6 py-4 flex gap-4"
+    className=" bg-white rounded-lg px-6 py-4 flex gap-4"
     id="type-score"
     style={{ border: "1px solid #ddd" }}
   >
     <div className="flex-2">
       <h2 className=" text-orange-500 font-bold text-2xl">KẾT QUẢ</h2>
-      <div className="detail flex flex-wrap gap-[20%] mt-4 pl-4 max-w-[360px]">
-        <div className="w-2/5">
-          <p className="text-sm text-gray-600 mt-3">Word Per Minute</p>
+      <div className="detail grid grid-cols-3 flex-wrap gap-8 mt-4 pl-4 max-w-[560px]">
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Số từ đã gõ</p>
+          <p className="font-semibold text-3xl mt-2 text-center">
+            <span>{result.wordTyped || 0}</span>
+            <span className="text-sm text-red-400">
+              ({result.wordError || 0})
+            </span>
+          </p>
+        </div>
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Số chữ / phút</p>
           <p className="font-semibold text-3xl mt-2 text-center">
             {result.wpm || 0}
           </p>
         </div>
-        <div className="w-2/5">
-          <p className="text-sm text-gray-600 mt-3">Char Per Minute</p>
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Tỉ lệ đúng</p>
+          <p className=" mt-3.5 text-center text-xl italic">
+            {result.wa || 0}%
+          </p>
+        </div>
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Số ký tự đã gõ</p>
+          <p className="font-semibold text-3xl mt-2 text-center">
+            <span>{result.charTyped || 0}</span>
+            <span className="text-sm text-red-400">
+              ({result.charError || 0})
+            </span>
+          </p>
+        </div>
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Số ký tự / phút</p>
           <p className="font-semibold text-3xl mt-2 text-center">
             {result.cpm || 0}
           </p>
         </div>
-        <div className="w-2/5">
-          <p className="text-sm text-gray-600 mt-3">Word Accuracy Rate</p>
-          <p className="font-medium text-xl italic mt-2 text-center">
-            {result.wa || 0}%
-          </p>
-        </div>
-        <div className="w-2/5">
-          <p className="text-sm text-gray-600 mt-3">Char Accuracy Rate</p>
-          <p className="font-medium text-xl italic mt-2 text-center">
+        <div className="">
+          <p className="text-sm text-gray-600 mt-3">Tỉ lệ đúng</p>
+          <p className=" mt-3.5 text-center text-xl italic">
             {result.ca || 0}%
           </p>
         </div>
@@ -124,6 +143,12 @@ const Result = ({ result }) => (
           Excelent
         </p>
       </div>
+      <Button
+        className="h-14 bg-green-500 hover:bg-green-700 text-lg"
+        onClick={() => reset()}
+      >
+        <GrPowerReset size={20} /> Thử lại
+      </Button>
     </div>
     <div className="flex-1">
       {/* <h2 className=" text-blue-500 font-bold text-2xl">ĐIỂM</h2> */}
@@ -131,17 +156,71 @@ const Result = ({ result }) => (
   </div>
 );
 
+const rankList = [
+  {
+    rank: 1,
+    name: "Guest 1",
+    wpm: 120,
+    cpm: 386,
+    wa: 88.16,
+    ca: 82.14,
+    score: 243,
+    attemp: 3,
+  },
+  {
+    rank: 2,
+    name: "Guest 2",
+    wpm: 110,
+    cpm: 356,
+    wa: 85.12,
+    ca: 80.14,
+    score: 223,
+    attemp: 2,
+  },
+  {
+    rank: 3,
+    name: "Guest 3",
+    wpm: 100,
+    cpm: 326,
+    wa: 82.08,
+    ca: 78.16,
+    score: 203,
+    attemp: 5,
+  },
+  {
+    rank: 4,
+    name: "Guest 4",
+    wpm: 90,
+    cpm: 296,
+    wa: 79.04,
+    ca: 76.18,
+    score: 183,
+    attemp: 4,
+  },
+  {
+    rank: 5,
+    name: "Guest 5",
+    wpm: 80,
+    cpm: 266,
+    wa: 76.0,
+    ca: 74.2,
+    score: 163,
+    attemp: 1,
+  },
+];
+
 const Rank = () => {
   return (
     <div
       className="mt-8 bg-white rounded-lg px-6 py-4 flex gap-4"
       style={{ border: "1px solid #d5d5d5" }}
     >
-      <div>
+      <div className="w-full">
         <h2 className=" text-gray-700 font-bold text-">XẾP HẠNG</h2>
-        <table className="">
+        <table className="mt-6 min-w-[700px] w-5/6 text-center">
           <tbody>
-            <tr>
+            <tr className="text-gray-700 [&_th]:py-3 bg-gray-200">
+              <th>Rank</th>
               <th>User Name</th>
               <th>WPM</th>
               <th>CPM</th>
@@ -151,82 +230,74 @@ const Rank = () => {
               <th>Attemp</th>
               {/* <th>total</th> */}
             </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
-            </tr>
-            <tr>
-              <td>Guest</td>
-              <td>82</td>
-              <td>250</td>
-              <td>80.14%</td>
-              <td>78.8%</td>
-              <td>248</td>
-              <td>82</td>
+
+            {rankList.map((item, index) => (
+              <RankItem
+                id={item.rank}
+                key={index}
+                rank={item.rank}
+                userName={item.name}
+                wpm={item.wpm}
+                cpm={item.cpm}
+                wa={item.wa}
+                ca={item.ca}
+                score={item.score}
+                attempt={item.attemp}
+              />
+            ))}
+            <tr
+              className="text-gray-700 [&_td]:py-4 shadow-inner shadow-blue-400"
+              style={{ border: "1px solid #eee" }}
+            >
+              <td colSpan={2} className="font-medium text-sm">
+                TRUNG BINH
+              </td>
+              <td className="text-green-500 font-medium">42</td>
+              <td>102</td>
+              <td className="text-sm">75%</td>
+              <td className="text-sm">63%</td>
+              <td>124</td>
+              <td>5</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+  );
+};
+
+type IRankItemProps = {
+  id: number;
+  userName: string;
+  rank: number;
+  wpm: number;
+  cpm: number;
+  wa: number;
+  ca: number;
+  score: number;
+  attempt: number;
+};
+const RankItem = (props: IRankItemProps) => {
+  return (
+    <tr
+      className="text-gray-700 [&_td]:py-4"
+      style={{ border: "1px solid #eee" }}
+    >
+      <td className="text-sm">{props.rank}</td>
+      <td
+        className={`font-medium ${
+          props.rank === 1 ? "font-medium text-lg" : "text-sm"
+        } `}
+      >
+        {props.userName}
+      </td>
+      <td className="text-green-500 font-medium">{props.wpm}</td>
+      <td>{props.cpm}</td>
+      <td className="text-sm">{props.wa}</td>
+      <td className="text-sm">{props.ca}</td>
+      <td>{props.score}</td>
+      <td>{props.attempt}</td>
+    </tr>
   );
 };
 
@@ -239,9 +310,11 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const userInputArray = React.useMemo(() => {
     return userInput.split(" ");
   }, [userInput]);
+  const [typedCharCount, setTypedCharCount] = React.useState(0);
   const [wordIndex, setWordIndex] = React.useState(0);
   const [typingWord, setTypingWord] = React.useState("");
-  const wordDebounce = useDebounce(typingWord, 10);
+  const [typingChar, setTypingChar] = React.useState("");
+  const wordDebounce = useDebounce(typingWord, 0);
   const [prevDebounce, setPrevDebounce] = React.useState("");
   const [failCount, setFailCount] = React.useState(0);
   const [initTime, setInitTime] = React.useState(30);
@@ -251,6 +324,10 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const [isShowScore, setIsShowScore] = React.useState(false);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const [result, setResult] = React.useState({
+    wordTyped: 0,
+    charTyped: 0,
+    wordError: 0,
+    charError: 0,
     wpm: 0,
     cpm: 0,
     wa: 0,
@@ -260,7 +337,9 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const resetType = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     inputRef.current?.removeAttribute("disabled");
+    setTypedCharCount(0);
     setParagraphs("");
     setUserInput("");
     setTime(initTime);
@@ -273,11 +352,6 @@ const SpeedTest = (props: ISpeedTestProps) => {
     window.scrollTo({
       top: 0,
       behavior: "smooth", // This makes the h to top of window
-    });
-
-    document.getElementById("speed-test-page")?.scrollTo({
-      top: 0,
-      behavior: "smooth", // This makes the scroll top of page
     });
 
     document.getElementById("speed-test-page")?.scrollTo({
@@ -306,6 +380,14 @@ const SpeedTest = (props: ISpeedTestProps) => {
     setTypingWord(value);
 
     if (value.slice(-1) === " " || value.slice(-1) === "\n") {
+      if (prevDebounce !== paragraphsArray[wordIndex]) {
+        console.log(
+          "asdasdasdasdasd",
+          prevDebounce,
+          paragraphsArray[wordIndex]
+        );
+        setFailCount(failCount + prevDebounce.length);
+      }
       setUserInput((prev) => prev + value.slice(0, value.length - 1) + " ");
       setWordIndex(wordIndex + 1);
       setIsNextWord(true);
@@ -313,40 +395,50 @@ const SpeedTest = (props: ISpeedTestProps) => {
   };
 
   const caculScore = () => {
-    let charFail = failCount;
+    const charFail = wordIndex ? failCount : 0;
     let wordFail = 0;
 
-    const typedWordArray = paragraphsArray.slice(0, wordIndex - 1);
+    console.log("charFail", charFail);
+
+    const typedWordArray = paragraphsArray.slice(0, wordIndex);
     const typedWord = typedWordArray.join("");
     typedWordArray.map((word, index) => {
       if (word !== userInputArray[index]) {
-        charFail += word.length;
         wordFail += 1;
       }
     });
-    charFail = Math.min(charFail, typedWord.length);
-    const wpm = Math.floor(typedWordArray.length / (initTime / 60));
-    const cpm = Math.floor((typedWord.length / initTime) * 60);
-    const wa =
-      Math.floor(
-        ((typedWordArray.length - wordFail) / typedWordArray.length) * 10000
-      ) / 100;
-    const ca =
-      Math.floor(((typedWord.length - charFail) / typedWord.length) * 10000) /
-      100;
+
+    const wordTyped = typedWordArray.length;
+    const charTyped = wordIndex ? typedCharCount : 0;
+
+    const wpm = Math.floor(wordTyped / (initTime / 60));
+    const cpm = Math.floor((charTyped / initTime) * 60);
+    const wa = wordTyped
+      ? Math.floor(((wordTyped - wordFail) / wordTyped) * 10000) / 100
+      : 0;
+    const ca = charTyped
+      ? Math.floor(((charTyped - charFail) / charTyped) * 10000) / 100
+      : 0;
     const score =
       Math.floor(
-        Math.sqrt(
-          (typedWord.length * (typedWord.length - failCount) * wa * ca) /
-            (initTime || 1)
-        )
+        Math.sqrt((typedWord.length * charTyped * wa * ca) / (initTime || 1))
       ) / 10;
-    setResult({ wpm, cpm, wa, ca, score });
+    setResult({
+      wordTyped,
+      charTyped,
+      wordError: wordFail,
+      charError: charFail,
+      wpm,
+      cpm,
+      wa,
+      ca,
+      score,
+    });
   };
 
   const finishType = () => {
-    setIsTyping(false);
     caculScore();
+    setIsTyping(false);
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -355,6 +447,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
     inputRef.current?.setAttribute("disabled", "disabled");
 
     setIsShowScore(true);
+    scrollToId("type-result");
   };
 
   const getWord = () => {
@@ -417,13 +510,15 @@ const SpeedTest = (props: ISpeedTestProps) => {
       if (isNextWord) return setIsNextWord(false);
       if (prevDebounce.length > wordDebounce.length) {
         setFailCount(failCount + (prevDebounce.length - wordDebounce.length));
+      } else if (prevDebounce.length < wordDebounce.length) {
+        setTypedCharCount(typedCharCount + 1);
       }
     }
   }, [wordDebounce]);
 
   React.useEffect(() => {
     setTypingWord("");
-    scrollToId("char-" + wordIndex);
+    scrollTo("#char-" + wordIndex, ".words-wrapper");
   }, [wordIndex]);
 
   React.useEffect(() => {
@@ -437,12 +532,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
   }, []);
 
   return (
-    <div
-      className="shadow shadow-gray-700 p-4 flex-1 px-6 overflow-auto"
-      id="speed-test-page"
-    >
-      <h2 className="text-3xl font-bold mt-4">Kiểm tra tốc độ gõ</h2>
-
+    <div className=" p-4 flex-1 px-6 overflow-auto" id="speed-test-page">
       <div
         className="bg-white px-6 py-5 rounded-lg mt-4 flex gap-4"
         style={{ border: "2px solid #D8D8D8" }}
@@ -462,20 +552,20 @@ const SpeedTest = (props: ISpeedTestProps) => {
               <Timer time={time} />
             </div>
           </div>
-          <div className="relative">
-            <div
-              className="h-[120px] overflow-y-hidden bg-[#F5F6FA] px-4 pb-3 rounded-lg  shadow-sm shadow-gray-300"
-              style={{ border: "1px solid #d8d8d8" }}
-            >
+          <div
+            className="relative bg-[#F5F6FA] px-4 py-3 rounded-lg shadow-sm shadow-gray-300 "
+            style={{ border: "1px solid #d8d8d8" }}
+          >
+            <div className="h-[120px] overflow-y-hidden   words-wrapper">
               <div
-                className="text-2xl flex flex-wrap overflow-auto"
+                className="text-2xl flex flex-wrap overflow-auto "
                 style={{ wordSpacing: "8px" }}
               >
                 <div id="first-word"></div>
                 {paragraphsArray.map((item, index) => (
                   <div
                     id={"char-" + index}
-                    className={`px-1.5 text-2xl h-9 pt-1 inline rounded-lg ${
+                    className={`px-1.5 text-2xl h-9 pb-1 inline rounded-lg ${
                       wordIndex === index ? "bg-yellow-300 text-white" : ""
                     } ${
                       userInputArray[index] !== undefined
@@ -523,7 +613,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
                 ))}
               </div>
             </div>
-            <div className="absolute top-10 left-1 right-1 h-[79px] bg-[#f6faffaa]"></div>
+            <div className="absolute top-12 left-1 right-1 h-[90px] bg-[#f6faffaa]"></div>
           </div>
           <div className="flex gap-8 items-center mt-6">
             <textarea
@@ -543,7 +633,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
               <p>reset</p>
 
               <p className="absolute text-xs -bottom-4 w-full left-0 text-center text-gray-400">
-                ( F5 )
+                <span>( F5 )</span>
               </p>
             </button>
           </div>
@@ -557,10 +647,16 @@ const SpeedTest = (props: ISpeedTestProps) => {
         <div className="h-full w-40 bg-red-300"></div>
       </div>
 
-      <div className="duration-200" id="type-result">
+      <div className="duration-200 pt-8" id="type-result">
         {result.score !== null ? (
-          <div className={`${isTyping ? "opacity-30" : ""}`}>
-            <Result result={result} />
+          <div
+            className={` rounded-lg ${
+              isTyping
+                ? "opacity-30"
+                : "shadow-xl border-blue-400 border-solid border-2 shadow-blue-500"
+            }`}
+          >
+            <Result result={result} reset={resetType} />
           </div>
         ) : null}
       </div>
