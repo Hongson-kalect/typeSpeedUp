@@ -59,11 +59,12 @@ const Header = () => {
         <div className="user-info flex gap-2">
           <div className="flex items-center justify-center">
             <Image
-              className="bg-gray-400 rounded-full"
-              src="/user.png"
+              className="bg-gray-400 rounded-full object-cover w-10 h-10"
+              src="https://th.bing.com/th/id/OIP.SIQlKH33GB2cq4eWyCaLxAHaEK?rs=1&pid=ImgDetMain"
+              alt="user"
               width={40}
               height={40}
-              alt="user"
+              style={{ border: "1px solid #ddd" }}
             />
           </div>
           <div className="flex flex-col justify-center">

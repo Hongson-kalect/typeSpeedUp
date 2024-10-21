@@ -1,24 +1,116 @@
 "use client";
 
+import Keyboard from "@/components/custom/keyboard";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 import * as React from "react";
+import { useNavigation } from "react-day-picker";
 import { CiSearch } from "react-icons/ci";
-import { FaUnlock } from "react-icons/fa";
+import { FaUnlock, FaUser } from "react-icons/fa";
 import { IoIosPricetags, IoMdStar } from "react-icons/io";
 import { IoStarOutline } from "react-icons/io5";
+import { PiPlus } from "react-icons/pi";
+import { RiHistoryFill } from "react-icons/ri";
 
 export interface IParagraphsPageProps {}
 
 export default function ParagraphsPage(props: IParagraphsPageProps) {
   return (
     <div className="px-6 pt-6">
-      <Header />
-      <ParagraphsList />
+      <div>
+        <Header />
+      </div>
+      <div className="mt-6">
+        <ParagraphsList />
+      </div>
     </div>
   );
 }
 
 const Header = () => {
-  return <div>header</div>;
+  const [date, setDate] = React.useState(new Date());
+  const [isRange, setIsRange] = React.useState(false);
+  return (
+    <div
+      id="para-header"
+      className="bg-white rounded-lg p-4 py-2 flex justify-between"
+    >
+      <div className="language flex gap-2 items-center">
+        <p className="font-medium text-lg">Language:</p>
+        <Select defaultValue="vi">
+          <SelectTrigger className="w-32 border-none outline-none !ring-0 text-sm">
+            <SelectValue placeholder="Theme" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="vi">Viet Nam</SelectItem>
+            <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="system">System</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <p className="font-medium text-lg">Time:</p>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[120px] justify-start text-left text-xs",
+                !date && "text-muted-foreground"
+              )}
+            >
+              {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
+              {date ? (
+                date.getFullYear() +
+                "-" +
+                date.getMonth().toString().padStart(2, "0") +
+                "-" +
+                date.getDate()
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(date) => date && setDate(date)}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div>
+        <Link href="/paragraphs/add">
+          <Button className="bg-blue-600 hover:bg-blue-800">
+            <PiPlus /> <p>Add paragraphs</p>
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
 };
 
 const ParagraphsList = () => {
@@ -34,6 +126,46 @@ const ParagraphsList = () => {
             placeholder="search text"
             className="w-[40%] bg-transparent h-10 outline-none border-none flex-1"
           />
+        </div>
+
+        <div className="flex items-center justify-center gap-2">
+          <div
+            className="p-1 rounded-xl px-2 bg-blue-50 flex items-center justify-center gap-2"
+            style={{ border: "1px solid #aaa" }}
+          >
+            <Options
+              content={
+                <IoIosPricetags
+                  size={24}
+                  // color="#555"
+                  className="text-gray-500 hover:text-black cursor-pointer"
+                />
+              }
+              tooltip={"History"}
+            />
+            <div className="h-5 bg-gray-300 w-[1px]"></div>
+            <Options
+              content={
+                <RiHistoryFill
+                  size={24}
+                  // color="#555"
+                  className="text-gray-500 hover:text-black cursor-pointer"
+                />
+              }
+              tooltip={"Your favorite"}
+            />
+            <div className="h-5 bg-gray-300 w-[1px]"></div>
+            <Options
+              content={
+                <FaUser
+                  size={22}
+                  // color="#555"
+                  className="text-gray-500 hover:text-black cursor-pointer"
+                />
+              }
+              tooltip={"Your content"}
+            />
+          </div>
         </div>
       </div>
 
@@ -70,7 +202,22 @@ const ParagraphsList = () => {
           <ParaItem />
         </tbody>
       </table>
+
+      <Keyboard />
     </div>
+  );
+};
+
+const Options = ({ content, tooltip, active = false }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>{content}</TooltipTrigger>
+        <TooltipContent sideOffset={8}>
+          <p className="text-xs bg-gray-800">{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

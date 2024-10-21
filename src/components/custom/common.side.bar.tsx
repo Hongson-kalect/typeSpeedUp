@@ -48,7 +48,7 @@ type SideBarItemProps = {
 };
 const SideBarItem = (props: SideBarItemProps) => {
   const pathName = usePathname();
-  const active = React.useMemo(() => pathName === props.href, [pathName]);
+  const active = React.useMemo(() => pathName.includes(props.href), [pathName]);
   return (
     <Link
       href={props.href}
