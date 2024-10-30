@@ -1,6 +1,12 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 export const authOptions = {
+  pages: {
+    signIn: "/auth/signin",
+  },
+  session: {
+    strategy: "jwt",
+  },
   // Configure one or more authentication providers
   providers: [
     GithubProvider({

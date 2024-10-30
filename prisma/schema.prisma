@@ -1,0 +1,329 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ModelA {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  bId      String   @db.ObjectId @unique
+  b        ModelB   @relation(fields: [bId], references: [id])
+}
+
+model ModelB {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  a        ModelA ?
+}
+
+
+model Asset {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  gold     String
+  crystal  String
+  themes   String[] @db.ObjectId
+  user User?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Ban {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId @unique
+  user      User     @relation(fields: [userId], references: [id])
+  time      String
+  permanent String
+  reason    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Device {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String   @db.ObjectId
+  user     User     @relation(fields: [userId], references: [id])
+  ip       String
+  time     String
+  location String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Favorite {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  user       User  @relation(fields: [userId], references: [id]) 
+  type       String
+  targetId    String  @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Game {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  tag             String
+  genre           String
+  // gameInfoId      String   @db.ObjectId @unique
+  gameInfo        GameInfo []
+  // defaultLanguage String
+  defaultLanguageId String @db.ObjectId
+  defaultLanguage Language @relation(fields: [defaultLanguageId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model GameInfo {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  played          Int
+  stage           String
+  completed       Int
+  isNew           Boolean
+  hotPoint           String
+  recoverEmail    String
+  ban             String
+  gameId          String @db.ObjectId
+  game            Game  @relation(fields: [gameId] , references: [id])
+  languageId String @db.ObjectId
+  languages Language @relation(fields: [languageId] , references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Language {
+  id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  code  String
+  flag  String
+  desc  String
+  gameInfo GameInfo[]
+  paragraphs Paragraph[]
+  gameDefaultLanguage Game[]
+  novelDefaultLanguage Novel[]
+  setting Setting[]
+  typeStyle TypeStyle[]
+  word Word[]
+  wordRate WordRate[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Novel {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  defaultLanguageId String @db.ObjectId
+  defaultLanguage Language @relation(fields: [defaultLanguageId], references: [id])
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id])
+  level           String
+  seri            String
+  rate            String
+  rateTime        String
+  chapter         String
+  price           String
+  unit            String
+  prev            String
+  next            String
+  tag             String
+  desc            String
+  paragraphs      Paragraph[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Paragraph {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  languageId String  @db.ObjectId
+  language  Language @relation(fields: [languageId], references: [id])
+  header    String
+  content   String
+  desc      String
+  rate      String
+  rateTime  String
+  userId    String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+  novelId String @db.ObjectId
+  novel Novel @relation(fields: [novelId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Profile {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  born        Int
+  gender      Boolean
+  firstName   String
+  lastName    String
+  displayName String
+  nation      String
+  avatar      String
+  role        String
+  user User?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Rank {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id])
+  game         String
+  rank         Int
+  score        String
+  time         String
+  recoverEmail String
+  desc         String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Rate {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id])
+  type         String
+  targetId       String
+  rate         String
+  crossPlatform String
+  platformID   String
+  recoverEmail String
+  desc         String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Report {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id])
+  type         String
+  targetId       String
+  reportType   String
+  desc         String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Score {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  targetId    String  //para
+  wps       String
+  cps       String
+  score     String
+  wa        String
+  time      Int
+  ca        String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Setting {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User?
+  languageId String  @db.ObjectId
+  language  Language @relation(fields: [languageId], references: [id])
+  themes    String[] @db.ObjectId
+  typeStyleId String @db.ObjectId
+  typeStyle TypeStyle @relation(fields: [typeStyleId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SpecialRule {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeStyleId String @db.ObjectId
+  typeStyle TypeStyle @relation(fields: [typeStyleId], references: [id])
+  input     String
+  output    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Store {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  themeId   String   @db.ObjectId
+  themes    String @db.ObjectId
+  price     String
+  unit      String
+  desc      String
+  rate      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Theme {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      String
+  src       String
+  style     String
+  desc      String
+  // rateId    String   @db.ObjectId
+  // rate      Rate     @relation(fields: [rateId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TypeStyle {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  languageId String  @db.ObjectId
+  language  Language @relation(fields: [languageId], references: [id])
+  setting Setting[]
+  specialRule SpecialRule[]
+  code      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  username      String
+  password      String
+  crossPlatform String
+  platformID    String
+  recoverEmail  String
+  ban           Ban?
+  favorite  Favorite[]
+  novels Novel[]
+  paragraph Paragraph[]
+  score Score[]
+  rank Rank[]
+  rate Rate[]
+  report Report[]
+
+  profileId     String   @db.ObjectId @unique
+  profile       Profile  @relation(fields: [profileId], references: [id])
+  settingId     String   @db.ObjectId @unique
+  setting       Setting  @relation(fields: [settingId], references: [id])
+  assetId       String   @db.ObjectId @unique
+  asset         Asset    @relation(fields: [assetId], references: [id])
+  devices       Device[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Word {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  languageId String  @db.ObjectId
+  language  Language @relation(fields: [languageId], references: [id])
+  level     String
+  type      String
+  words     String
+  desc      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model WordRate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  languageId String  @db.ObjectId
+  language  Language @relation(fields: [languageId], references: [id])
+  rate      String
+  level     String
+  desc      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
