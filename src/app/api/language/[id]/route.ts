@@ -4,8 +4,16 @@ import { NextResponse, NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest) {
-  const items = await prisma.language.findMany();
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  //   const { searchParams } = new URL(request.query);
+  //   const id = searchParams.get("id");
+  const { id } = await params;
+  console.log("1 :>> ", id);
+  //   console.log("id :>> ", id);
+  const items = await prisma.language.findUnique({ where: { id } });
 
   return NextResponse.json(items);
 }
@@ -52,7 +60,6 @@ export async function DELETE(request: Request) {
 
   return NextResponse.json(items);
 }
-
 
 // export default async function handler(req, res) {
 //   return Response.json({ message: "Hello from Next.js!" });

@@ -7,18 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model ModelA {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  bId      String   @db.ObjectId @unique
-  b        ModelB   @relation(fields: [bId], references: [id])
-}
-
-model ModelB {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  a        ModelA ?
-}
-
-
 model Asset {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   gold     String
