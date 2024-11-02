@@ -317,7 +317,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const wordDebounce = useDebounce(typingWord, 0);
   const [prevDebounce, setPrevDebounce] = React.useState("");
   const [failCount, setFailCount] = React.useState(0);
-  const [initTime, setInitTime] = React.useState(30);
+  const [initTime, setInitTime] = React.useState(60);
   const [time, setTime] = React.useState(initTime);
   const [isNextWord, setIsNextWord] = React.useState(false);
   const [isTyping, setIsTyping] = React.useState(false);

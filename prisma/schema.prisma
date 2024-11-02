@@ -8,6 +8,7 @@ generator client {
 }
 
 model Asset {
+  isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   gold     String
   crystal  String
@@ -18,6 +19,7 @@ model Asset {
 }
 
 model Ban {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId @unique
   user      User     @relation(fields: [userId], references: [id])
@@ -29,6 +31,7 @@ model Ban {
 }
 
 model Device {
+  isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   userId   String   @db.ObjectId
   user     User     @relation(fields: [userId], references: [id])
@@ -40,6 +43,7 @@ model Device {
 }
 
 model Favorite {
+  isDeleted Boolean @default(false)
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   userId     String   @db.ObjectId
   user       User  @relation(fields: [userId], references: [id]) 
@@ -50,6 +54,7 @@ model Favorite {
 }
 
 model Game {
+  isDeleted Boolean @default(false)
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   tag             String
@@ -64,6 +69,7 @@ model Game {
 }
 
 model GameInfo {
+  isDeleted Boolean @default(false)
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   played          Int
   stage           String
@@ -81,6 +87,7 @@ model GameInfo {
 }
 
 model Language {
+  isDeleted Boolean @default(false)
   id    String   @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   code  String
@@ -99,6 +106,7 @@ model Language {
 }
 
 model Novel {
+  isDeleted Boolean @default(false)
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   defaultLanguageId String @db.ObjectId
   defaultLanguage Language @relation(fields: [defaultLanguageId], references: [id])
@@ -121,6 +129,7 @@ model Novel {
 }
 
 model Paragraph {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   languageId String  @db.ObjectId
   language  Language @relation(fields: [languageId], references: [id])
@@ -138,6 +147,7 @@ model Paragraph {
 }
 
 model Profile {
+  isDeleted Boolean @default(false)
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   born        Int
   gender      Boolean
@@ -153,6 +163,7 @@ model Profile {
 }
 
 model Rank {
+  isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
   user         User     @relation(fields: [userId], references: [id])
@@ -167,6 +178,7 @@ model Rank {
 }
 
 model Rate {
+  isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
   user         User     @relation(fields: [userId], references: [id])
@@ -182,6 +194,7 @@ model Rate {
 }
 
 model Report {
+  isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
   user         User     @relation(fields: [userId], references: [id])
@@ -194,6 +207,7 @@ model Report {
 }
 
 model Score {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
@@ -210,6 +224,7 @@ model Score {
 }
 
 model Setting {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      User?
   languageId String  @db.ObjectId
@@ -222,6 +237,7 @@ model Setting {
 }
 
 model SpecialRule {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   typeStyleId String @db.ObjectId
   typeStyle TypeStyle @relation(fields: [typeStyleId], references: [id])
@@ -232,6 +248,7 @@ model SpecialRule {
 }
 
 model Store {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   themeId   String   @db.ObjectId
   themes    String @db.ObjectId
@@ -244,6 +261,7 @@ model Store {
 }
 
 model Theme {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   type      String
   src       String
@@ -256,6 +274,7 @@ model Theme {
 }
 
 model TypeStyle {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   languageId String  @db.ObjectId
   language  Language @relation(fields: [languageId], references: [id])
@@ -267,6 +286,7 @@ model TypeStyle {
 }
 
 model User {
+  isDeleted Boolean @default(false)
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   username      String
   password      String
@@ -294,6 +314,7 @@ model User {
 }
 
 model Word {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   languageId String  @db.ObjectId
   language  Language @relation(fields: [languageId], references: [id])
@@ -306,6 +327,7 @@ model Word {
 }
 
 model WordRate {
+  isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   languageId String  @db.ObjectId
   language  Language @relation(fields: [languageId], references: [id])

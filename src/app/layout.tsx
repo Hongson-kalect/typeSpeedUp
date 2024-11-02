@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider, getSession } from "next-auth/react";
 
 const geistSans = localFont({
@@ -26,14 +27,18 @@ export default function RootLayout({
   children: React.ReactNode;
   session: any;
 }>) {
+  const queryClient = new QueryClient();
+
   return (
     <html lang="en">
       {/* <SessionProvider session={session}> */}
+      <QueryClientProvider client={queryClient}>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
         </body>
+      </QueryClientProvider>
       {/* </SessionProvider> */}
     </html>
   );
