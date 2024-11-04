@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider, getSession } from "next-auth/react";
+import ReactQueryProvider from "@/providers/reactQuery.provider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,29 +30,24 @@ export default function RootLayout({
   children: React.ReactNode;
   session: any;
 }>) {
-  const queryClient = new QueryClient();
-
   return (
     <html lang="en">
       {/* <SessionProvider session={session}> */}
-      <QueryClientProvider client={queryClient}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </QueryClientProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ToastContainer />
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
       {/* </SessionProvider> */}
     </html>
   );
 }
 
 // Fetch session data
-// RootLayout.getInitialProps = async ({ ctx }) => {
-//   const session = await getSession(ctx);
-//   return {
-//     pageProps: {
-//       session,
-//     },
-//   };
-// };
+RootLayout.getInitialProps = async ({ ctx }) => {
+  const session = await getSession(ctx);
+  return {
+    session: session ? JSON.parse(JSON.stringify(session)) : null, // Ensure session is a plain object
+  };
+};

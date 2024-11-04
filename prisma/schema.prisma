@@ -92,7 +92,7 @@ model Language {
   name  String
   code  String
   flag  String
-  desc  String
+  desc  String?
   gameInfo GameInfo[]
   paragraphs Paragraph[]
   gameDefaultLanguage Game[]

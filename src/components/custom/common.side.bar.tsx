@@ -13,7 +13,7 @@ export const CommonSideBar = () => {
   console.log(b, "params");
 
   return (
-    <div className="w-60 pt-5">
+    <div className="w-60 pt-5 h-full overflow-auto">
       <h1 className="font-bold text-xl text-center">
         <span className="text-blue-500">Type</span>
         <span>Speed</span>

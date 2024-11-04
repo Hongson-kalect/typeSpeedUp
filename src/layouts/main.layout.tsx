@@ -17,7 +17,7 @@ export interface ILayoutProps {
 export default function MainLayout(props: ILayoutProps) {
   return (
     <div className="flex h-screen w-screen">
-      <div>
+      <div className="h-full">
         <CommonSideBar />
       </div>
       <div className="flex-1 bg-[#d5ddff] flex flex-col">
