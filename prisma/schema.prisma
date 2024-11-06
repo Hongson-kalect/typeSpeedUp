@@ -289,9 +289,17 @@ model User {
   isDeleted Boolean @default(false)
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   username      String
-  password      String
+  password      String?
   crossPlatform String
   platformID    String
+  email          String   @unique
+  emailVerified  DateTime?
+  image          String?
+  sessions       Session[] 
+  scope  String @default("S1")
+  access_token String?
+  refresh_token String?
+
   recoverEmail  String
   ban           Ban?
   favorite  Favorite[]
@@ -311,6 +319,23 @@ model User {
   devices       Device[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Session {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken  String   @unique
+  userId        String @db.ObjectId
+  expires       DateTime
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model VerificationToken {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier  String
+  token       String
+  expires     DateTime
 }
 
 model Word {

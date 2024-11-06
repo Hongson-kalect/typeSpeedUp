@@ -1,3 +1,5 @@
+"use client";
+
 import { CommonSideBar } from "@/components/custom/common.side.bar";
 import {
   Select,
@@ -6,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import * as React from "react";
 import { HiMiniFire } from "react-icons/hi2";
@@ -54,7 +57,13 @@ const Header = () => {
           </SelectContent>
         </Select>
 
-        <div className="user-info flex gap-2">
+        <div
+          className="user-info flex gap-2 cursor-pointer"
+          onClick={() => {
+            console.log("Bruh");
+            signIn("google");
+          }}
+        >
           <div className="flex items-center justify-center">
             <Image
               className="bg-gray-400 rounded-full"

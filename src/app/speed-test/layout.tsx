@@ -6,6 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import MainLayout from "@/layouts/main.layout";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import * as React from "react";
 import { HiMiniFire } from "react-icons/hi2";
@@ -15,17 +17,7 @@ export interface ISpeedTestLayoutProps {
 }
 
 export default function SpeedTestLayout(props: ISpeedTestLayoutProps) {
-  return (
-    <div className="flex h-screen w-screen">
-      <div>
-        <CommonSideBar />
-      </div>
-      <div className="flex-1 bg-[#d5ddff] flex flex-col">
-        <Header />
-        {props.children}
-      </div>
-    </div>
-  );
+  return <MainLayout>{props.children}</MainLayout>;
 }
 
 const Header = () => {
@@ -54,7 +46,12 @@ const Header = () => {
           </SelectContent>
         </Select>
 
-        <div className="user-info flex gap-2">
+        <div
+          className="user-info flex gap-2 cursor-pointer"
+          onClick={() => {
+            signIn("google");
+          }}
+        >
           <div className="flex items-center justify-center">
             <Image
               className="bg-gray-400 rounded-full"
