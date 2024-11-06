@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/providers/prismaClient";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 // import GithubProvider from "next-auth/providers/github";
 
 export default NextAuth({
@@ -18,6 +18,18 @@ export default NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
+  },
+
+  callbacks: {
+    async session({ session, user }) {
+      console.log("session  cb q:>> ", session);
+      // Add custom user data to the session object
+      session.user.id = user.id;
+      session.user.name = user.name;
+      session.user.email = user.email;
+      session.user.image = user.image;
+      return session;
+    },
   },
 });
 

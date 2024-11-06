@@ -10,10 +10,10 @@ generator client {
 model Asset {
   isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  gold     String
-  crystal  String
+  gold     BigInt
+  crystal  BigInt
   themes   String[] @db.ObjectId
-  user User?
+  user AppUser?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -22,8 +22,8 @@ model Ban {
   isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId @unique
-  user      User     @relation(fields: [userId], references: [id])
-  time      String
+  user      AppUser     @relation(fields: [userId], references: [id])
+  time      DateTime
   permanent String
   reason    String
   createdAt  DateTime @default(now())
@@ -34,9 +34,9 @@ model Device {
   isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   userId   String   @db.ObjectId
-  user     User     @relation(fields: [userId], references: [id])
+  user     AppUser     @relation(fields: [userId], references: [id])
   ip       String
-  time     String
+  time     DateTime
   location String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -46,7 +46,7 @@ model Favorite {
   isDeleted Boolean @default(false)
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   userId     String   @db.ObjectId
-  user       User  @relation(fields: [userId], references: [id]) 
+  user       AppUser  @relation(fields: [userId], references: [id]) 
   type       String
   targetId    String  @db.ObjectId
   createdAt  DateTime @default(now())
@@ -75,7 +75,7 @@ model GameInfo {
   stage           String
   completed       Int
   isNew           Boolean
-  hotPoint           String
+  hotPoint           Float
   recoverEmail    String
   ban             String
   gameId          String @db.ObjectId
@@ -111,18 +111,15 @@ model Novel {
   defaultLanguageId String @db.ObjectId
   defaultLanguage Language @relation(fields: [defaultLanguageId], references: [id])
   userId          String   @db.ObjectId
-  user            User     @relation(fields: [userId], references: [id])
-  level           String
-  seri            String
-  rate            String
-  rateTime        String
-  chapter         String
-  price           String
-  unit            String
-  prev            String
-  next            String
-  tag             String
-  desc            String
+  user            AppUser     @relation(fields: [userId], references: [id])
+  level           String?
+  name            String?
+  rate            Float?
+  rateTime        Int?
+  price           String?
+  unit            String?
+  tag             String?
+  desc            String?
   paragraphs      Paragraph[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -135,11 +132,16 @@ model Paragraph {
   language  Language @relation(fields: [languageId], references: [id])
   header    String
   content   String
-  desc      String
-  rate      String
-  rateTime  String
+  desc      String @default("")
+  chapter   String?
+  rate      Float @default(0)
+  rateTime  Int @default(0)
+  prev      String?
+  next      String?
+  isPrivate Boolean @default(false)
+  completed BigInt @default(0)
   userId    String  @db.ObjectId
-  user      User    @relation(fields: [userId], references: [id])
+  user      AppUser    @relation(fields: [userId], references: [id])
   novelId String @db.ObjectId
   novel Novel @relation(fields: [novelId], references: [id])
   createdAt  DateTime @default(now())
@@ -157,7 +159,7 @@ model Profile {
   nation      String
   avatar      String
   role        String
-  user User?
+  user AppUser?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -166,10 +168,10 @@ model Rank {
   isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id])
+  user         AppUser     @relation(fields: [userId], references: [id])
   game         String
   rank         Int
-  score        String
+  score        Float
   time         String
   recoverEmail String
   desc         String
@@ -181,10 +183,10 @@ model Rate {
   isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id])
+  user         AppUser     @relation(fields: [userId], references: [id])
   type         String
   targetId       String
-  rate         String
+  rate         Float
   crossPlatform String
   platformID   String
   recoverEmail String
@@ -197,7 +199,7 @@ model Report {
   isDeleted Boolean @default(false)
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id])
+  user         AppUser     @relation(fields: [userId], references: [id])
   type         String
   targetId       String
   reportType   String
@@ -210,15 +212,15 @@ model Score {
   isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
+  user      AppUser     @relation(fields: [userId], references: [id])
   type      String
   targetId    String  //para
-  wps       String
-  cps       String
-  score     String
-  wa        String
+  wps       Float
+  cps       Float
+  score     Float
+  wa        Float
   time      Int
-  ca        String
+  ca        Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -226,7 +228,7 @@ model Score {
 model Setting {
   isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User?
+  user      AppUser?
   languageId String  @db.ObjectId
   language  Language @relation(fields: [languageId], references: [id])
   themes    String[] @db.ObjectId
@@ -252,7 +254,7 @@ model Store {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   themeId   String   @db.ObjectId
   themes    String @db.ObjectId
-  price     String
+  price     BigInt
   unit      String
   desc      String
   rate      String
@@ -285,58 +287,6 @@ model TypeStyle {
   updatedAt  DateTime @updatedAt
 }
 
-model User {
-  isDeleted Boolean @default(false)
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  username      String
-  password      String?
-  crossPlatform String
-  platformID    String
-  email          String   @unique
-  emailVerified  DateTime?
-  image          String?
-  sessions       Session[] 
-  scope  String @default("S1")
-  access_token String?
-  refresh_token String?
-
-  recoverEmail  String
-  ban           Ban?
-  favorite  Favorite[]
-  novels Novel[]
-  paragraph Paragraph[]
-  score Score[]
-  rank Rank[]
-  rate Rate[]
-  report Report[]
-
-  profileId     String   @db.ObjectId @unique
-  profile       Profile  @relation(fields: [profileId], references: [id])
-  settingId     String   @db.ObjectId @unique
-  setting       Setting  @relation(fields: [settingId], references: [id])
-  assetId       String   @db.ObjectId @unique
-  asset         Asset    @relation(fields: [assetId], references: [id])
-  devices       Device[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model Session {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken  String   @unique
-  userId        String @db.ObjectId
-  expires       DateTime
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model VerificationToken {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier  String
-  token       String
-  expires     DateTime
-}
 
 model Word {
   isDeleted Boolean @default(false)
@@ -361,4 +311,112 @@ model WordRate {
   desc      String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model AppUser {
+  isDeleted Boolean @default(false)
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  username      String?
+  password      String?
+  crossPlatform String?
+  platformID    String
+  scope  String @default("S1")
+  access_token String?
+  refresh_token String?
+
+  recoverEmail  String?
+  ban           Ban?
+  favorite  Favorite[]
+  novels Novel[]
+  paragraph Paragraph[]
+  score Score[]
+  rank Rank[]
+  rate Rate[]
+  report Report[]
+  userId String   @db.ObjectId @unique
+  user User @relation(fields: [userId], references: [id])
+
+  profileId     String   @db.ObjectId @unique
+  profile       Profile  @relation(fields: [profileId], references: [id])
+  settingId     String   @db.ObjectId @unique
+  setting       Setting  @relation(fields: [settingId], references: [id])
+  assetId       String   @db.ObjectId @unique
+  asset         Asset    @relation(fields: [assetId], references: [id])
+  devices       Device[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+  appUser AppUser?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+ 
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([userId, credentialID])
 }

@@ -22,26 +22,25 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import * as React from "react";
-import { useNavigation } from "react-day-picker";
 import { CiSearch } from "react-icons/ci";
 import { FaUnlock, FaUser } from "react-icons/fa";
 import { IoIosPricetags, IoMdStar } from "react-icons/io";
-import { IoStarOutline } from "react-icons/io5";
 import { PiPlus } from "react-icons/pi";
 import { RiHistoryFill } from "react-icons/ri";
+import { useParagraphQuery } from "./_utils/query";
+import { IParagraphItem } from "./_utils/interface";
 
 export interface IParagraphsPageProps {}
 
 export default function ParagraphsPage(props: IParagraphsPageProps) {
   return (
-    <div className="px-6 pt-6">
+    <div className="px-6 pt-6 flex-1 flex flex-col">
       <div>
         <Header />
       </div>
-      <div className="mt-6">
+      <div className="mt-6 flex-1 bg-white  rounded-2xl">
         <ParagraphsList />
       </div>
     </div>
@@ -114,8 +113,10 @@ const Header = () => {
 };
 
 const ParagraphsList = () => {
+  const { getParagraph } = useParagraphQuery();
+
   return (
-    <div className="bg-white rounded-lg p-4">
+    <div className="bg-white rounded-lg p-4 flex flex-col">
       <div className="filter rounded-3xl flex items-center justify-between">
         <div
           className="search bg-gray-100 flex items-center gap-4 rounded-full px-6 w-80"
@@ -169,7 +170,7 @@ const ParagraphsList = () => {
         </div>
       </div>
 
-      <table className="mt-6 min-w-[700px] w-full">
+      <table className="mt-6 min-w-[700px] w-full flex-1">
         <tbody>
           <tr className="text-gray-700 [&_th]:py-3 bg-gray-200">
             <th>
@@ -195,15 +196,13 @@ const ParagraphsList = () => {
             {/* <th>total</th> */}
           </tr>
 
-          <ParaItem />
-          <ParaItem />
-          <ParaItem />
-          <ParaItem />
-          <ParaItem />
+          {getParagraph.data?.map((item, index) => {
+            return <ParaItem {...item} key={index} />;
+          })}
         </tbody>
       </table>
 
-      <Keyboard />
+      {/* <Keyboard /> */}
     </div>
   );
 };
@@ -221,10 +220,10 @@ const Options = ({ content, tooltip, active = false }) => {
   );
 };
 
-const ParaItem = () => {
+const ParaItem = (props: IParagraphItem) => {
   return (
     <tr
-      className="text-gray-700 [&_td]:py-3"
+      className="text-gray-700 [&_td]:py-3 cursor-pointer hover:bg-blue-100"
       style={{ border: "1px solid #eee" }}
     >
       <td className="font-medium text-sm">
@@ -235,24 +234,27 @@ const ParaItem = () => {
       <td className="text-green-500 font-medium px-2">
         <div>
           <h3 className="line-clamp-1 text-gray-800 font-bold">
-            Lời bài hát tiến quân ca
+            {props.header}
           </h3>
-          <p className="text-gray-400 text-xs line-clamp-1">
-            Cùng nhay ta đileen theo bước đường thanh niên đi lên cố gắng xứng
-            đáng chau ngoan Bác Hồ
-          </p>
+          <p className="text-gray-400 text-xs line-clamp-1">{props.content}</p>
         </div>
       </td>
       <td className="text-left">
         <div className="px-2 flex items-start justify-start flex-col">
-          <p className="text-gray-700 font-bold text-sm">160 Từ</p>
-          <p className="text-gray-400 text-xs "> 456 ký tự</p>
+          <p className="text-gray-700 font-bold text-sm">
+            <span>Word: </span>
+            {props.content.split(" ").length}
+          </p>
+          <p className="text-gray-400 text-xs ">
+            <span>Char: </span>
+            {props.content.replaceAll(" ", "").length}
+          </p>
         </div>
       </td>
       <td>
         <div className="flex items-center justify-center">
           <button className="px-2 py-0.5 -skew-x-12 bg-orange-500 text-white rounded-lg text-xs">
-            Khó
+            {"Easy"}
           </button>
         </div>
       </td>
@@ -275,7 +277,7 @@ const ParaItem = () => {
       </td>
 
       <td>
-        <p className="text-sm text-center">18:30</p>
+        {/* <p className="text-sm text-center">18:30</p> */}
         <p className="text-center text-xs text-blue-400">2 giờ trước</p>
       </td>
     </tr>

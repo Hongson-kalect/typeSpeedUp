@@ -4,12 +4,11 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
-  //get request body
-  const requestBody = await request.json();
+  const requestBody = await request.json(); //query params trong body của request
 
-  const matchedItems = await prisma.paragraph.findMany({
+  const matchedItem = await prisma.appUser.findUnique({
     where: requestBody,
   });
 
-  return NextResponse.json(matchedItems);
+  return NextResponse.json(matchedItem);
 }

@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/providers/prismaClient";
 // import GithubProvider from "next-auth/providers/github";
 
@@ -18,6 +18,30 @@ const handler = NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
+  },
+
+  callbacks: {
+    async session({ session, token }) {
+      console.log("session  cb:>> ", session, token);
+      // Add custom user data to the session object
+      session.user.id = token?.id;
+      session.user.name = token?.name;
+      session.user.email = token?.email;
+      session.user.image = token?.picture;
+      session.user.role = token?.role; // Include the new field
+      return session;
+    },
+    async jwt({ token, user }) {
+      console.log("token,user :>> ", token, user);
+      if (user) {
+        token.id = user?.id;
+        token.name = user?.name;
+        token.email = user?.email;
+        token.picture = user?.image;
+        token.role = user?.role; // Include the new field
+      }
+      return token;
+    },
   },
 });
 

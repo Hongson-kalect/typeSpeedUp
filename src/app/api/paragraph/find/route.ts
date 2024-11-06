@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   const requestBody = await request.json(); //query params trong body của request
 
-  const matchedItem = await prisma.schema_name.findUnique({
+  const matchedItem = await prisma.paragraph.findUnique({
     where: requestBody,
   });
 

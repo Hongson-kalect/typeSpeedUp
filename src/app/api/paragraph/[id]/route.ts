@@ -10,7 +10,7 @@ export async function GET(
 ) {
   const id = await getRequestId(params);
 
-  const items = await prisma.schema_name.findUnique({ where: { id } });
+  const items = await prisma.paragraph.findUnique({ where: { id } });
   return NextResponse.json(items);
 }
 
@@ -21,7 +21,7 @@ export async function PUT(
   const id = await getRequestId(params);
 
   const requestBody = await request.json();
-  const editedItem = await prisma.schema_name.update({
+  const editedItem = await prisma.paragraph.update({
     where: { id },
     data: requestBody,
   });
@@ -34,12 +34,12 @@ export async function DELETE(
 ) {
   const id = await getRequestId(params);
 
-  const deletedItem = await prisma.schema_name.findUnique({ where: { id } });
+  const deletedItem = await prisma.paragraph.findUnique({ where: { id } });
   if (!deletedItem) {
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
   }
 
-  const items = await prisma.schema_name.update({
+  const items = await prisma.paragraph.update({
     where: { id },
     data: { isDeleted: true },
   });

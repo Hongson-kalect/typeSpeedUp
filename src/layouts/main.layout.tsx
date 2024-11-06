@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import * as React from "react";
 import { HiMiniFire } from "react-icons/hi2";
@@ -32,6 +32,13 @@ export default function MainLayout(props: ILayoutProps) {
 }
 
 const Header = () => {
+  const { data: session } = useSession();
+
+  React.useEffect(() => {
+    // addUser
+  }, [session]);
+
+  console.log("session ádasdasdasd:>> ", session);
   return (
     <div className="h-16  px-6 bg-white flex items-center justify-between w-full">
       <p className="text-xl font-bold">Kiểm tra tốc độ gõ</p>
@@ -67,7 +74,7 @@ const Header = () => {
           <div className="flex items-center justify-center">
             <Image
               className="bg-gray-400 rounded-full"
-              src="/user.png"
+              src={session?.user?.image ?? ""}
               width={40}
               height={40}
               alt="user"
@@ -75,9 +82,11 @@ const Header = () => {
           </div>
           <div className="flex flex-col justify-center">
             <p className="user-name text-sm font-bold text-gray-800">
-              Guest Account
+              {session?.user?.name || "Guest Account"}
             </p>
-            <p className="text-gray-400 text-xs">Login to save your progress</p>
+            <p className="text-gray-400 text-xs">
+              {session?.user?.email || "Login to save progress"}
+            </p>
           </div>
         </div>
       </div>

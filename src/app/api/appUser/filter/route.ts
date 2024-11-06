@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   //get request body
   const requestBody = await request.json();
 
-  const matchedItems = await prisma.paragraph.findMany({
+  const matchedItems = await prisma.appUser.findMany({
     where: requestBody,
   });
 
