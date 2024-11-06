@@ -10,8 +10,8 @@ generator client {
 model Asset {
   isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  gold     String
-  crystal  String
+  gold     BigInt
+  crystal  BigInt
   themes   String[] @db.ObjectId
   user User?
   createdAt  DateTime @default(now())
@@ -23,7 +23,7 @@ model Ban {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId @unique
   user      User     @relation(fields: [userId], references: [id])
-  time      String
+  time      DateTime
   permanent String
   reason    String
   createdAt  DateTime @default(now())
@@ -36,7 +36,7 @@ model Device {
   userId   String   @db.ObjectId
   user     User     @relation(fields: [userId], references: [id])
   ip       String
-  time     String
+  time     DateTime
   location String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -75,7 +75,7 @@ model GameInfo {
   stage           String
   completed       Int
   isNew           Boolean
-  hotPoint           String
+  hotPoint           Float
   recoverEmail    String
   ban             String
   gameId          String @db.ObjectId
@@ -112,17 +112,14 @@ model Novel {
   defaultLanguage Language @relation(fields: [defaultLanguageId], references: [id])
   userId          String   @db.ObjectId
   user            User     @relation(fields: [userId], references: [id])
-  level           String
-  seri            String
-  rate            String
-  rateTime        String
-  chapter         String
-  price           String
-  unit            String
-  prev            String
-  next            String
-  tag             String
-  desc            String
+  level           String?
+  name            String?
+  rate            Float?
+  rateTime        Int?
+  price           String?
+  unit            String?
+  tag             String?
+  desc            String?
   paragraphs      Paragraph[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -135,9 +132,14 @@ model Paragraph {
   language  Language @relation(fields: [languageId], references: [id])
   header    String
   content   String
-  desc      String
-  rate      String
-  rateTime  String
+  desc      String @default("")
+  chapter   String?
+  rate      Float @default(0)
+  rateTime  Int @default(0)
+  prev      String?
+  next      String?
+  isPrivate Boolean @default(false)
+  completed BigInt @default(0)
   userId    String  @db.ObjectId
   user      User    @relation(fields: [userId], references: [id])
   novelId String @db.ObjectId
@@ -169,7 +171,7 @@ model Rank {
   user         User     @relation(fields: [userId], references: [id])
   game         String
   rank         Int
-  score        String
+  score        Float
   time         String
   recoverEmail String
   desc         String
@@ -184,7 +186,7 @@ model Rate {
   user         User     @relation(fields: [userId], references: [id])
   type         String
   targetId       String
-  rate         String
+  rate         Float
   crossPlatform String
   platformID   String
   recoverEmail String
@@ -213,12 +215,12 @@ model Score {
   user      User     @relation(fields: [userId], references: [id])
   type      String
   targetId    String  //para
-  wps       String
-  cps       String
-  score     String
-  wa        String
+  wps       Float
+  cps       Float
+  score     Float
+  wa        Float
   time      Int
-  ca        String
+  ca        Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -252,7 +254,7 @@ model Store {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   themeId   String   @db.ObjectId
   themes    String @db.ObjectId
-  price     String
+  price     BigInt
   unit      String
   desc      String
   rate      String

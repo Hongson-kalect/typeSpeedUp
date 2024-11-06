@@ -1,13 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { useLanguageQuery } from "../_utils/query";
-import LanguageItem from "../components/language.item";
-import Image from "next/image";
-import { ILanguageItem } from "../_utils/interface";
 import { Button } from "@/components/ui/button";
-import { PiPlus } from "react-icons/pi";
+import * as React from "react";
 import { FaPlus } from "react-icons/fa";
+import { ILanguageItem } from "../_utils/interface";
+import { useLanguageQuery } from "../_utils/query";
 import { useLanguageStore } from "../_utils/store";
 
 export interface ILanguageListProps {
@@ -29,10 +26,6 @@ export default function LanguageList(props: ILanguageListProps) {
     setAction("update");
   };
 
-  React.useEffect(() => {
-    console.log("getLanguage :>> ", getLanguage);
-  }, [getLanguage.data]);
-
   return (
     <div className="flex-1 bg-white rounded-2xl p-4 overflow-auto">
       <div className="flex items-center justify-between">
@@ -46,7 +39,6 @@ export default function LanguageList(props: ILanguageListProps) {
         </Button>
       </div>
       <div className="w-full">
-        {/* <h2 className=" text-gray-700 font-bold text-">XẾP HẠNG</h2> */}
         <table className="mt-6 min-w-[700px] w-full text-center">
           <tbody>
             <tr className="text-gray-700 [&_th]:py-3 bg-gray-200">
