@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import * as React from "react";
@@ -34,8 +35,16 @@ export default function MainLayout(props: ILayoutProps) {
 const Header = () => {
   const { data: session } = useSession();
 
+  const addUser = async () => {
+    console.log("session", session);
+    if (!session) return;
+    const res = await axios.post("/api/appUser", session.user);
+    console.log("res :>> ", res);
+  };
+
   React.useEffect(() => {
     // addUser
+    addUser();
   }, [session]);
 
   console.log("session ádasdasdasd:>> ", session);

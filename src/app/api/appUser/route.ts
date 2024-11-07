@@ -11,10 +11,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const requestBody = await request.json(); //body từ request
+  const { name, email, image, id: userId } = await request.json(); //body từ request
 
-  const newItem = await prisma.appUser.create({
-    data: requestBody,
+  const appUser = await prisma.appUser.findUnique({
+    where: { crossPlatform: "google", userId },
   });
-  return NextResponse.json(newItem);
+
+  console.log("appUser", appUser);
+  if (appUser) {
+    prisma.appUser.update({ where: { id: appUser.id }, data: { userId } });
+  } else prisma.appUser.create({ data: requestBody });
+
+  // const newItem = await prisma.appUser.create({
+  //   data: requestBody,
+  // });
+  return NextResponse.json(requestBody);
 }
