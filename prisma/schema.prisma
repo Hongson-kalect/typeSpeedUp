@@ -155,10 +155,10 @@ model Profile {
   gender      Boolean
   firstName   String
   lastName    String
-  displayName String
+  displayName String?
   nation      String
-  avatar      String
-  role        String
+  avatar      String?
+  role        String?
   user AppUser?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -169,12 +169,12 @@ model Rank {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
   user         AppUser     @relation(fields: [userId], references: [id])
-  game         String
-  rank         Int
+  game         String @db.ObjectId
+  rank         Int?
   score        Float
   time         String
   recoverEmail String
-  desc         String
+  desc         String @default("")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -187,10 +187,10 @@ model Rate {
   type         String
   targetId       String
   rate         Float
-  crossPlatform String
-  platformID   String
-  recoverEmail String
-  desc         String
+  // crossPlatform String
+  // platformID   String
+  // recoverEmail String
+  desc         String @default("")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -336,12 +336,12 @@ model AppUser {
   userId String   @db.ObjectId @unique
   user User @relation(fields: [userId], references: [id])
 
-  profileId     String   @db.ObjectId @unique
-  profile       Profile  @relation(fields: [profileId], references: [id])
-  settingId     String   @db.ObjectId @unique
-  setting       Setting  @relation(fields: [settingId], references: [id])
-  assetId       String   @db.ObjectId @unique
-  asset         Asset    @relation(fields: [assetId], references: [id])
+  profileId     String?   @db.ObjectId @unique
+  profile       Profile?  @relation(fields: [profileId], references: [id])
+  settingId     String?   @db.ObjectId @unique
+  setting       Setting?  @relation(fields: [settingId], references: [id])
+  assetId       String?   @db.ObjectId @unique
+  asset         Asset?    @relation(fields: [assetId], references: [id])
   devices       Device[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
