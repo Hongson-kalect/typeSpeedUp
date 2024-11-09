@@ -13,6 +13,7 @@ import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import * as React from "react";
 import { HiMiniFire } from "react-icons/hi2";
+import { useMainStore } from "./main.store";
 
 export interface ILayoutProps {
   children: React.ReactNode;
@@ -34,12 +35,14 @@ export default function MainLayout(props: ILayoutProps) {
 
 const Header = () => {
   const { data: session } = useSession();
+  const { setUserInfo } = useMainStore();
 
   const addUser = async () => {
     console.log("session", session);
     if (!session) return;
     const res = await axios.post("/api/appUser", session.user);
     console.log("res :>> ", res);
+    setUserInfo(res.data);
   };
 
   React.useEffect(() => {

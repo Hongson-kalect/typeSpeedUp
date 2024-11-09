@@ -31,6 +31,7 @@ import { PiPlus } from "react-icons/pi";
 import { RiHistoryFill } from "react-icons/ri";
 import { useParagraphQuery } from "./_utils/query";
 import { IParagraphItem } from "./_utils/interface";
+import { useRouter } from "next/navigation";
 
 export interface IParagraphsPageProps {}
 
@@ -221,8 +222,11 @@ const Options = ({ content, tooltip, active = false }) => {
 };
 
 const ParaItem = (props: IParagraphItem) => {
+  const router = useRouter();
+
   return (
     <tr
+      onClick={() => router.push(`/paragraphs/${props.id}`)}
       className="text-gray-700 [&_td]:py-3 cursor-pointer hover:bg-blue-100"
       style={{ border: "1px solid #eee" }}
     >
@@ -264,7 +268,7 @@ const ParaItem = (props: IParagraphItem) => {
       <td className="text-sm text-center">
         <div className="flex flex-col items-center justify-center">
           <FaUnlock className="text-green-500" />
-          <p className="text-green-300 text-xs">Public</p>
+          <p className="text-green-700 text-xs">Public</p>
         </div>
       </td>
       <td className="text-sm text-center">

@@ -10,8 +10,8 @@ generator client {
 model Asset {
   isDeleted Boolean @default(false)
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  gold     BigInt
-  crystal  BigInt
+  gold     Int
+  crystal  Int
   themes   String[] @db.ObjectId
   user AppUser?
   createdAt  DateTime @default(now())
@@ -118,6 +118,7 @@ model Novel {
   rateTime        Int?
   price           String?
   unit            String?
+  isPrivate Boolean @default(false)
   tag             String?
   desc            String?
   paragraphs      Paragraph[]
@@ -139,7 +140,7 @@ model Paragraph {
   prev      String?
   next      String?
   isPrivate Boolean @default(false)
-  completed BigInt @default(0)
+  completed Int @default(0)
   userId    String  @db.ObjectId
   user      AppUser    @relation(fields: [userId], references: [id])
   novelId String @db.ObjectId
@@ -254,7 +255,7 @@ model Store {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   themeId   String   @db.ObjectId
   themes    String @db.ObjectId
-  price     BigInt
+  price     Int
   unit      String
   desc      String
   rate      String
@@ -318,8 +319,6 @@ model AppUser {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   username      String?
   password      String?
-  crossPlatform String?
-  platformID    String
   scope  String @default("S1")
   access_token String?
   refresh_token String?
