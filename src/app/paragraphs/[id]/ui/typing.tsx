@@ -1,6 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ResetIcon } from "@radix-ui/react-icons";
 import { fail } from "assert";
 import * as React from "react";
 import { CiEdit } from "react-icons/ci";
@@ -84,7 +87,7 @@ export default function TypingArea(props: ITypingAreaProps) {
   }, [wordDebounce]);
 
   return (
-    <div className="typing mt-1 bg-red rounded-lg w-full min-h-[400px] flex-1 p-4">
+    <div className="typing mt-1 bg-red rounded-lg w-full flex-1 p-4 flex flex-col h-full">
       <div className="flex items-end justify-between">
         <div className="flex gap-2 items-center">
           <p className="text-gray-600">Tiếng Việt</p>
@@ -99,7 +102,7 @@ export default function TypingArea(props: ITypingAreaProps) {
           <Timer time={time} />
         </div>
       </div>
-      <div className="h-[120px] overflow-y-hidden words-wrapper px-6 py-2 bg-blue-50 shadow shadow-blue-100">
+      <div className="min-h-[120px] flex-1 overflow-y-hidden words-wrapper px-6 py-2 bg-blue-50 shadow shadow-blue-100">
         <div
           className="text-2xl flex flex-wrap overflow-auto "
           style={{ wordSpacing: "8px" }}
@@ -154,6 +157,22 @@ export default function TypingArea(props: ITypingAreaProps) {
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="input mt-4 flex items-center justify-center gap-8 p-2">
+        <Input className="shadow-inner shadow-gray-500 h-12 w-[320px] text-2xl font-medium focus:shadow focus:shadow-blue-800 focus:translate-x-1 duration-200 focus:border disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-70  text-center" />
+        <div className="flex flex-col items-center justify-center relative">
+          <Button
+            size={"lg"}
+            className="bg-green-500 hover:bg-green-700  text-white"
+          >
+            <ResetIcon />
+            Reset
+          </Button>
+          <p className="text-gray-500 text-sm font-light absolute -bottom-5">
+            {"Or just F5"}
+          </p>
         </div>
       </div>
     </div>

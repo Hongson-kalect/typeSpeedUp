@@ -1,5 +1,7 @@
 import * as React from "react";
 import TypingArea from "./ui/typing";
+import NovelOptions from "./ui/options";
+import TypedScore from "./ui/score";
 
 export interface IParaInfoPageProps {}
 
@@ -13,10 +15,10 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
         <div className="typing mt-1 bg-white rounded-lg w-full min-h-[400px] flex-1">
           <TypingArea />
         </div>
-        <div className="result mt-4 bg-white rounded-lg w-full h-[400px]"></div>
+        <TypedScore />
       </div>
       <div className="w-[400px] h-full px-2 py-4 flex-col flex">
-        <div className="options bg-white rounded-lg w-full h-[400px]"></div>
+        <NovelOptions />
         <div className="ranking mt-4 bg-white rounded-lg w-full flex-1"></div>
       </div>
     </div>
