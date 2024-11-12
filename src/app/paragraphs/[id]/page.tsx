@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import TypingArea from "./ui/typing";
 import NovelOptions from "./ui/options";
@@ -6,6 +8,27 @@ import TypedScore from "./ui/score";
 export interface IParaInfoPageProps {}
 
 export default function ParaInfoPage(props: IParaInfoPageProps) {
+  const [result, setResult] = React.useState({
+    wpm: 0,
+    cpm: 0,
+    accuracy: 0,
+    score: 0,
+    failChar: 0,
+    failWord: 0,
+  });
+  const resetResult = () => {
+    setResult({
+      wpm: 0,
+      cpm: 0,
+      accuracy: 0,
+      score: 0,
+      failChar: 0,
+      failWord: 0,
+    });
+  };
+
+  console.log("result", result);
+
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 px-6 py-4 flex-col flex">
@@ -13,9 +36,9 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
           Chapter 1: Thế giới này thật thú vị
         </h2>
         <div className="typing mt-1 bg-white rounded-lg w-full min-h-[400px] flex-1">
-          <TypingArea />
+          <TypingArea setResult={setResult} />
         </div>
-        <TypedScore />
+        <TypedScore result={result} />
       </div>
       <div className="w-[400px] h-full px-2 py-4 flex-col flex">
         <NovelOptions />
