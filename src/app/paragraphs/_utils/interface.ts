@@ -17,3 +17,16 @@ export type IParagraphItem = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+export type ResultType = {
+  time?: number;
+  wpm: number;
+  cpm: number;
+  wAccuracy: number;
+  cAccuracy: number;
+  score: number;
+  failChar: number;
+  failWord: number;
+  correctChar: number;
+  correctWord: number;
+};

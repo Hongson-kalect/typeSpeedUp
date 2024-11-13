@@ -1,13 +1,18 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import { StarIcon } from "@radix-ui/react-icons";
 import * as React from "react";
+import { BiLike } from "react-icons/bi";
+import { FaFlag } from "react-icons/fa";
 import { PiStarFill } from "react-icons/pi";
 
 export interface INovelOptionsProps {}
 
 export default function NovelOptions(props: INovelOptionsProps) {
   return (
-    <div className="options bg-white rounded-lg w-full pl-3 pr-5  py-4 relative">
-      <h2 className="line-clamp-2 text-xl font-medium text-gray-600">
+    <div className="options bg-white rounded-lg w-full pl-3 pr-5  pt-4 pb-2 relative">
+      <h2 className="line-clamp-2 text-xl font-medium text-gray-600 cursor-pointer">
         Từ ấy trong tôi bừng nắng hạ, Mặt trời chân lí chói qua tim, chói chang,
         cí lùm mía
       </h2>
@@ -34,6 +39,32 @@ export default function NovelOptions(props: INovelOptionsProps) {
           deserunt aperiam minus sint. Optio odit itaque necessitatibus beatae
           fuga, nisi sint.
         </p>
+      </div>
+
+      <div className="options flex items-end justify-between mt-4">
+        <div className="flex gap-4">
+          <div className="flex items-center gap-1 cursor-pointer hover:bg-blue-50 duration-150 px-1 text-sm py-1 rounded-md">
+            <BiLike /> Liked
+            <div className="h-full flex items-center justify-center rounded-[50%] bg-gray-100 px-2 py-1">
+              <p className="text-xs">1000</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer hover:bg-purple-50 duration-150 px-1 text-sm py-1 rounded-md">
+            <StarIcon /> Follow
+            <div className="h-full flex items-center justify-center rounded-[50%] bg-gray-100 px-2 py-1">
+              <p className="text-xs">1000</p>
+            </div>
+          </div>
+        </div>
+        <div className="report">
+          <Button
+            size={"sm"}
+            className="bg-red-500 text-white hover:bg-red-700"
+          >
+            <FaFlag size={16} />
+            <p className="text-sm">Báo cáo</p>
+          </Button>
+        </div>
       </div>
 
       <div className="absolute favor top-1 right-1">
