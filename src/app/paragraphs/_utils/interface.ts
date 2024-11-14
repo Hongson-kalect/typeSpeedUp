@@ -30,3 +30,53 @@ export type ResultType = {
   correctChar: number;
   correctWord: number;
 };
+
+export type ParaInfoType = {
+  id: string;
+  language: LanguageInfoType;
+  header: string;
+  content: string;
+  desc: string;
+  chapter: string;
+  rate: number;
+  rateTime: number;
+  prev?: string;
+  next?: string;
+  isPrivate: false;
+  completed: number;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  novel: NovelInfoType;
+};
+
+export type NovelInfoType = {
+  createdAt: string;
+  defaultLanguageId: string;
+  desc?: string;
+  id: string;
+  status: string;
+  isDeleted: boolean;
+  isPrivate: boolean;
+  level: string;
+  name: string;
+  price: string;
+  rate: number;
+  rateTime: number;
+  tag: string;
+  unit: string;
+  lastChapter: number | string;
+  updatedAt: string;
+  userId: string;
+};
+
+export type LanguageInfoType = {
+  code: string;
+  createdAt: string;
+  desc: string;
+  flag: string;
+  id: string;
+  isDeleted: boolean;
+  name: string;
+  updatedAt: string;
+};

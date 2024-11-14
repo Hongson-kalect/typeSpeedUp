@@ -18,21 +18,22 @@ export interface ITypingAreaProps {
   isShowResult: boolean;
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>;
   setUserTyped: React.Dispatch<React.SetStateAction<string>>;
+  para?: string;
+  language?: string;
 }
 
 let timeInterval: NodeJS.Timeout;
 
 export default function TypingArea({
+  language,
+  para,
   setResult,
   isShowResult,
   setIsShowResult,
   setUserTyped,
 }: ITypingAreaProps) {
-  const [para, setPara] = React.useState(
-    "This is temp para is temp para is temp para is temp para is temp para is temp para is temp para is temp para is temp para is temp para is temp para"
-  );
   const paraArr = React.useMemo(() => {
-    return para.split(" ");
+    return para?.split(" ") || [];
   }, [para]);
 
   const [userInput, setUserInput] = React.useState("");
@@ -123,7 +124,7 @@ export default function TypingArea({
     });
 
     const wordCount = paraArr.length;
-    const charCount = para.replaceAll(" ", "").length;
+    const charCount = para?.replaceAll(" ", "")?.length || 0;
 
     const wpm = Math.floor((wordCount / (time / 60)) * 10) / 10;
     const cpm = Math.floor((charCount / (time / 60)) * 10) / 10;
@@ -175,7 +176,7 @@ export default function TypingArea({
     setTypingVal("");
     scrollTo("#char-" + wordIndex, ".words-wrapper");
 
-    if (wordIndex === paraArr.length) {
+    if (isTyping && wordIndex === paraArr.length) {
       setIsShowResult(true);
       clearInterval(timeInterval);
       //disable Input / hide para / show user input
@@ -197,7 +198,7 @@ export default function TypingArea({
     <div className="typing mt-1 bg-red rounded-lg w-full flex-1 p-4 flex flex-col h-full">
       <div className="flex items-end justify-between">
         <div className="flex gap-2 items-center">
-          <p className="text-gray-600">Tiếng Việt</p>
+          <p className="text-gray-600">{language}</p>
           <CiEdit size={18} />
           <Button onClick={() => setIsShowResult(!isShowResult)}>
             Toogle Result

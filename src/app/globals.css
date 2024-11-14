@@ -9,6 +9,16 @@ body {
     Arial, Helvetica, sans-serif;
 }
 
+/* Hides the scrollbar for modern browsers */
+.hide-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

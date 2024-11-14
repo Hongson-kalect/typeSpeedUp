@@ -4,17 +4,24 @@ import * as React from "react";
 import TypingArea from "./ui/typing";
 import NovelOptions from "./ui/options";
 import TypedScore from "./ui/score";
-import { ResultType } from "../_utils/interface";
+import { ParaInfoType, ResultType } from "../_utils/interface";
 import { MdReport } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { FaFlag } from "react-icons/fa";
 import { BiStar } from "react-icons/bi";
 import { Input } from "@/components/ui/input";
 import SendButton from "../components/send.button";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/compat/router";
+import axios from "axios";
+import { useParams } from "next/navigation";
 
 export interface IParaInfoPageProps {}
 
 export default function ParaInfoPage(props: IParaInfoPageProps) {
+  const router = useRouter();
+  const params = useParams();
+
   const [isShowResult, setIsShowResult] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState("");
   const [result, setResult] = React.useState<ResultType>({
@@ -28,6 +35,17 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
     correctChar: 0,
     correctWord: 0,
   });
+
+  const paraInfo = useQuery<ParaInfoType>({
+    queryFn: async () => {
+      const res = await axios.get("/api/paragraph/" + params.id);
+      return res.data;
+    },
+    queryKey: ["paraInfo"],
+  });
+
+  console.log("paraInfo", paraInfo);
+
   const resetResult = () => {
     setResult({
       wpm: 0,
@@ -42,16 +60,19 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
     });
   };
 
-  console.log("result", result.failChar);
+  console.log("router", router);
+  console.log("params", params);
 
   return (
     <div className="flex flex-1 overflow-auto w-full">
-      <div className="flex-1 px-6 py-4 flex-col flex overflow-auto">
+      <div className="flex-1 px-6 py-4 flex-col flex overflow-auto  hide-scroll">
         <h2 className="text-xl font-semibold text-gray-600">
-          Chapter 1: Thế giới này thật thú vị
+          Chapter {paraInfo.data?.chapter}: {paraInfo.data?.header}
         </h2>
         <div className="typing pt-1 bg-white rounded-lg w-full">
           <TypingArea
+            language={paraInfo.data?.language.name}
+            para={paraInfo.data?.content}
             setResult={setResult}
             isShowResult={isShowResult}
             setIsShowResult={setIsShowResult}
@@ -113,7 +134,7 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
         </div>
       </div>
       <div className="w-[400px] h-full px-2 py-4 flex-col flex">
-        <NovelOptions />
+        <NovelOptions novel={paraInfo.data?.novel} />
         <div className="ranking mt-4 px-4 py-3 bg-white rounded-lg w-full flex-1">
           <div>
             <h2 className=" text-gray-800 font-bold">

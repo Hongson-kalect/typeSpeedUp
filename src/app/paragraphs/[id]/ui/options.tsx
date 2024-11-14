@@ -6,39 +6,36 @@ import * as React from "react";
 import { BiLike } from "react-icons/bi";
 import { FaFlag } from "react-icons/fa";
 import { PiStarFill } from "react-icons/pi";
+import { NovelInfoType } from "../../_utils/interface";
 
-export interface INovelOptionsProps {}
+export interface INovelOptionsProps {
+  novel?: NovelInfoType;
+}
 
-export default function NovelOptions(props: INovelOptionsProps) {
+export default function NovelOptions({ novel }: INovelOptionsProps) {
   return (
     <div className="options bg-white rounded-lg w-full pl-3 pr-5  pt-4 pb-2 relative">
       <h2 className="line-clamp-2 text-xl font-medium text-gray-600 cursor-pointer">
-        Từ ấy trong tôi bừng nắng hạ, Mặt trời chân lí chói qua tim, chói chang,
-        cí lùm mía
+        {novel?.name}
       </h2>
       <div className="flex items-center justify-center mb-3 mt-5">
         <div className="h-24 w-48 bg-gray-400">Img desc</div>
       </div>
       <div className="flex gap-2 items-center">
         <p className="text-sm text-gray-500 w-24">Uploader:</p>
-        <p className="font-bold text-gray-800">Phùng Quốc Hùng</p>
+        <p className="font-bold text-gray-800">{novel?.userId}</p>
       </div>
       <div className="flex gap-2">
         <p className="text-sm text-gray-500 w-24 ">Chapter:</p>
-        <p className="font-bold text-blue-500">14</p>
+        <p className="font-bold text-blue-500">{novel?.lastChapter}</p>
       </div>
       <div className="flex gap-2">
         <p className="text-sm text-gray-500 w-24">Status:</p>
-        <p className="text-green-500 italic">Completed</p>
+        <p className="text-green-500 italic">{novel?.status || "Ongoing"}</p>
       </div>
       <div className="flex gap-2">
         <p className="text-sm text-gray-500 w-24">Description:</p>
-        <p className="line-clamp-3 text-sm">
-          Kể về Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit
-          ipsum accusamus natus, magni recusandae odit neque laborum molestias
-          deserunt aperiam minus sint. Optio odit itaque necessitatibus beatae
-          fuga, nisi sint.
-        </p>
+        <p className="line-clamp-3 text-sm">{novel?.desc}</p>
       </div>
 
       <div className="options flex items-end justify-between mt-4">
