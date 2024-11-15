@@ -47,6 +47,7 @@ export type ParaInfoType = {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  novelId: string;
   novel: NovelInfoType;
 };
 
@@ -61,8 +62,8 @@ export type NovelInfoType = {
   level: string;
   name: string;
   price: string;
-  rate: number;
-  rateTime: number;
+  like: number;
+  favorite: number;
   tag: string;
   unit: string;
   lastChapter: number | string;
@@ -79,4 +80,17 @@ export type LanguageInfoType = {
   isDeleted: boolean;
   name: string;
   updatedAt: string;
+};
+
+export type ScoreInfoType = {
+  cAccuracy: number;
+  cpm: number;
+  score: number;
+  targetId: string;
+  time: number;
+  type: string;
+  userId: string;
+  wAccuracy: number;
+  wpm: number;
+  rank?: string | number;
 };

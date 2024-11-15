@@ -10,21 +10,7 @@ export async function GET(
 ) {
   const id = await getRequestId(params);
 
-  const items = await prisma.novel.findUnique({
-    where: { id },
-    // include: { user: true },
-  });
-  const lastChapter = await prisma.paragraph.findFirst({
-    take: 1,
-    where: {
-      novelId: id,
-    },
-    orderBy: {
-      chapter: "desc",
-    },
-  });
-
-  items.lastChapter = lastChapter?.chapter;
+  const items = await prisma.like.findUnique({ where: { id } });
   return NextResponse.json(items);
 }
 
@@ -35,7 +21,7 @@ export async function PUT(
   const id = await getRequestId(params);
 
   const requestBody = await request.json();
-  const editedItem = await prisma.novel.update({
+  const editedItem = await prisma.like.update({
     where: { id },
     data: requestBody,
   });
@@ -48,12 +34,12 @@ export async function DELETE(
 ) {
   const id = await getRequestId(params);
 
-  const deletedItem = await prisma.novel.findUnique({ where: { id } });
+  const deletedItem = await prisma.like.findUnique({ where: { id } });
   if (!deletedItem) {
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
   }
 
-  const items = await prisma.novel.update({
+  const items = await prisma.like.update({
     where: { id },
     data: { isDeleted: true },
   });

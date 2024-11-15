@@ -4,17 +4,23 @@ import * as React from "react";
 import TypingArea from "./ui/typing";
 import NovelOptions from "./ui/options";
 import TypedScore from "./ui/score";
-import { ParaInfoType, ResultType } from "../_utils/interface";
+import {
+  NovelInfoType,
+  ParaInfoType,
+  ResultType,
+  ScoreInfoType,
+} from "../_utils/interface";
 import { MdReport } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { FaFlag } from "react-icons/fa";
 import { BiStar } from "react-icons/bi";
 import { Input } from "@/components/ui/input";
 import SendButton from "../components/send.button";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/compat/router";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { useMainStore } from "@/layouts/main.store";
 
 export interface IParaInfoPageProps {}
 
@@ -22,9 +28,14 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
   const router = useRouter();
   const params = useParams();
 
+  const { userInfo } = useMainStore();
+  const [reset, setReset] = React.useState<() => void>(() => {
+    return () => {};
+  });
   const [isShowResult, setIsShowResult] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState("");
   const [result, setResult] = React.useState<ResultType>({
+    time: 0,
     wpm: 0,
     cpm: 0,
     wAccuracy: 0,
@@ -36,6 +47,11 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
     correctWord: 0,
   });
 
+  const [rank, setRank] = React.useState({
+    best: {},
+    average: {},
+  });
+
   const paraInfo = useQuery<ParaInfoType>({
     queryFn: async () => {
       const res = await axios.get("/api/paragraph/" + params.id);
@@ -44,7 +60,50 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
     queryKey: ["paraInfo"],
   });
 
-  console.log("paraInfo", paraInfo);
+  const novelInfo = useQuery<NovelInfoType>({
+    queryFn: async () => {
+      if (!paraInfo?.data?.novelId) return;
+      const res = await axios.get("/api/novel/" + paraInfo.data.novelId);
+      return res.data;
+    },
+    queryKey: ["paraInfo", paraInfo],
+  });
+
+  const ranking = useMutation<{
+    best?: ScoreInfoType;
+    average?: ScoreInfoType;
+  }>({
+    mutationFn: async () => {
+      console.log("result :>> ", result);
+      if (!params.id || !isShowResult) return;
+
+      const { wpm, cpm, wAccuracy, cAccuracy, score, time } = result;
+      const res = await axios.post("/api/score/", {
+        wpm,
+        cpm,
+        wAccuracy,
+        cAccuracy,
+        score,
+        time,
+        userId: userInfo?.id,
+
+        type: "Paragraph",
+        targetId: params.id,
+      });
+      return res.data;
+    },
+    mutationKey: ["ranking"],
+    onSuccess: (data) => {
+      setRank(data);
+    },
+  });
+
+  React.useEffect(() => {
+    console.log("isShowResult, params.id :>> ", isShowResult, params.id);
+    if (isShowResult && params.id) {
+      ranking.mutate();
+    }
+  }, [isShowResult]);
 
   const resetResult = () => {
     setResult({
@@ -60,9 +119,6 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
     });
   };
 
-  console.log("router", router);
-  console.log("params", params);
-
   return (
     <div className="flex flex-1 overflow-auto w-full">
       <div className="flex-1 px-6 py-4 flex-col flex overflow-auto  hide-scroll">
@@ -77,9 +133,15 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
             isShowResult={isShowResult}
             setIsShowResult={setIsShowResult}
             setUserTyped={setUserTyped}
+            setReset={setReset}
           />
         </div>
-        <TypedScore isShowResult={isShowResult} result={result} />
+        <TypedScore
+          isShowResult={isShowResult}
+          result={result}
+          rank={rank}
+          reset={reset}
+        />
         <div className="flex gap-4 mt-8">
           <div className="bg-white flex-1 px-4 py-3 rounded-lg">
             <div className="flex justify-between">
@@ -134,7 +196,7 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
         </div>
       </div>
       <div className="w-[400px] h-full px-2 py-4 flex-col flex">
-        <NovelOptions novel={paraInfo.data?.novel} />
+        <NovelOptions novel={novelInfo.data} />
         <div className="ranking mt-4 px-4 py-3 bg-white rounded-lg w-full flex-1">
           <div>
             <h2 className=" text-gray-800 font-bold">

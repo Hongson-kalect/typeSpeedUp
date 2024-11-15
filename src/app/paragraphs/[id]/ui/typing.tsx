@@ -20,6 +20,7 @@ export interface ITypingAreaProps {
   setUserTyped: React.Dispatch<React.SetStateAction<string>>;
   para?: string;
   language?: string;
+  setReset: React.Dispatch<React.SetStateAction<() => void>>;
 }
 
 let timeInterval: NodeJS.Timeout;
@@ -31,6 +32,7 @@ export default function TypingArea({
   isShowResult,
   setIsShowResult,
   setUserTyped,
+  setReset,
 }: ITypingAreaProps) {
   const paraArr = React.useMemo(() => {
     return para?.split(" ") || [];
@@ -57,7 +59,6 @@ export default function TypingArea({
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!isTyping) setIsTyping(true);
     const value = e.target.value;
-    console.log("typingVal, value :>> ", typingVal, value);
 
     if (value.slice(-1) === " " || value.slice(-1) === "\n") {
       setIsGoingNextChar(true);
@@ -70,18 +71,6 @@ export default function TypingArea({
 
     // setUserInput(e.target.value);
   };
-
-  React.useEffect(() => {
-    if (isGoingNextChar) return setIsGoingNextChar(false);
-    if (prevDebounce.length > wordDebounce.length) {
-      setResult((prev) => ({
-        ...prev,
-        failChar:
-          (prev?.failChar || 0) + (prevDebounce.length - wordDebounce.length),
-      }));
-      setPrevDebounce(wordDebounce);
-    }
-  }, [wordDebounce]);
 
   const reset = () => {
     setWordIndex(0);
@@ -106,6 +95,11 @@ export default function TypingArea({
     inputRef.current?.removeAttribute("disabled");
     inputRef.current?.focus();
   };
+
+  React.useEffect(() => {
+    console.log("reset, set reset :>> ", reset);
+    setReset(() => reset);
+  }, []);
 
   const calculateResult = () => {
     let failWord = 0,
@@ -153,6 +147,18 @@ export default function TypingArea({
   };
 
   React.useEffect(() => {
+    if (isGoingNextChar) return setIsGoingNextChar(false);
+    if (prevDebounce.length > wordDebounce.length) {
+      setResult((prev) => ({
+        ...prev,
+        failChar:
+          (prev?.failChar || 0) + (prevDebounce.length - wordDebounce.length),
+      }));
+      setPrevDebounce(wordDebounce);
+    }
+  }, [wordDebounce]);
+
+  React.useEffect(() => {
     if (isTyping) {
       timeInterval = setInterval(() => {
         setTime((prev) => prev + 1);
@@ -177,18 +183,18 @@ export default function TypingArea({
     scrollTo("#char-" + wordIndex, ".words-wrapper");
 
     if (isTyping && wordIndex === paraArr.length) {
+      calculateResult();
       setIsShowResult(true);
       clearInterval(timeInterval);
       //disable Input / hide para / show user input
     }
   }, [wordIndex]);
 
-  React.useEffect(() => {
-    if (isShowResult) {
-      calculateResult();
-      setIsShowResult(true);
-    }
-  }, [isShowResult]);
+  // React.useEffect(() => {
+  //   if (isShowResult) {
+  //     setIsShowResult(true);
+  //   }
+  // }, [isShowResult]);
 
   React.useEffect(() => {
     inputRef.current?.focus();

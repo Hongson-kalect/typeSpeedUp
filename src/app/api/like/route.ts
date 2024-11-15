@@ -8,14 +8,18 @@ export async function GET(request: Request) {
   const targetId = urlObject.searchParams.get("targetId");
   const userId = urlObject.searchParams.get("userId");
   if (targetId && userId) {
-    const report = await prisma.report.findFirst({
+    const like = await prisma.like.findFirst({
       where: {
         targetId,
         userId,
       },
     });
 
-    return NextResponse.json(report);
+    const likeCount = await prisma.like.count({
+      where: { targetId, isDeleted: false },
+    });
+
+    return NextResponse.json({ like, likeCount });
   }
 
   const items = await prisma.like.findMany({
@@ -27,7 +31,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const requestBody = await request.json(); //body từ request
 
-  const newItem = await prisma.report.create({
+  const newItem = await prisma.like.create({
     data: requestBody,
   });
   return NextResponse.json(newItem);

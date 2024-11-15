@@ -33,6 +33,8 @@ export default function MainLayout(props: ILayoutProps) {
   );
 }
 
+
+
 const Header = () => {
   const { data: session } = useSession();
   const { setUserInfo } = useMainStore();
@@ -46,6 +48,7 @@ const Header = () => {
   };
 
   React.useEffect(() => {
+    console.log("Get User data");
     // addUser
     addUser();
   }, [session]);
@@ -79,7 +82,6 @@ const Header = () => {
         <div
           className="user-info flex gap-2 cursor-pointer"
           onClick={() => {
-            console.log("Bruh");
             signIn("google");
           }}
         >

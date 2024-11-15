@@ -200,16 +200,17 @@ model Report {
 model Score {
   isDeleted Boolean @default(false)
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      AppUser     @relation(fields: [userId], references: [id])
-  type      String
+  userId    String?   @db.ObjectId
+  user      AppUser?     @relation(fields: [userId], references: [id])
+  rank String //1,2,3, best, average,... 
+  type      String //score of what? para / game,...
   targetId    String  //para
-  wps       Float
-  cps       Float
+  wpm       Float
+  cpm       Float
   score     Float
-  wa        Float
+  wAccuracy        Float
+  cAccuracy        Float
   time      Int
-  ca        Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

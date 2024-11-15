@@ -12,22 +12,8 @@ export async function GET(
 
   const items = await prisma.paragraph.findUnique({
     where: { id },
-    include: { novel: true, language: true },
+    include: { language: true },
   });
-
-  if (items?.novelId) {
-    const lastChapter = await prisma.paragraph.findFirst({
-      take: 1,
-      where: {
-        novelId: items.novelId,
-      },
-      orderBy: {
-        chapter: "desc",
-      },
-    });
-
-    items.novel.lastChapter = lastChapter?.chapter;
-  }
   return NextResponse.json(items);
 }
 

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { GrPowerReset } from "react-icons/gr";
-import { ResultType } from "../../_utils/interface";
+import { ResultType, ScoreInfoType } from "../../_utils/interface";
 import {
   Table,
   TableBody,
@@ -18,6 +18,11 @@ import { Timer } from "./typing";
 export interface ITypedScoreProps {
   result: ResultType;
   isShowResult: boolean;
+  reset: () => void;
+  rank: {
+    best?: ScoreInfoType;
+    average?: ScoreInfoType;
+  };
 }
 
 // const result = {
@@ -32,10 +37,46 @@ export interface ITypedScoreProps {
 //   score: 60.8,
 // };
 
-export default function TypedScore({ result, isShowResult }: ITypedScoreProps) {
-  const reset = () => {
-    alert("reset score");
-  };
+export default function TypedScore({
+  result,
+  isShowResult,
+  rank,
+  reset,
+}: ITypedScoreProps) {
+  const ranks = React.useMemo(() => {
+    if (rank.best && rank.average)
+      return [rank.best, rank.average, result].sort(
+        (a, b) => b.score - a.score
+      );
+    else return [result];
+  }, [rank, result]);
+
+  function calculatePercentage(value: number) {
+    if (!rank.average || !rank.best) return 50;
+    const average = rank.average.score;
+    const best = rank.best.score;
+
+    const range = best - average;
+
+    if (value === average) {
+      return 50;
+    } else {
+      // Tính toán phần trăm tăng với tỷ lệ cao hơn cho các giá trị gần trung bình
+      const diff = value - average;
+      if (diff > 0) {
+        return 50 + Math.floor(50 * Math.pow(diff / range, 1 / 3) * 10) / 10;
+      } else {
+        const cal =
+          50 -
+          Math.floor(80 * Math.pow(Math.abs(diff) / average, 1 / 3) * 10) / 10;
+        return cal > 5 ? cal : 5;
+      }
+    }
+  }
+
+  React.useEffect(() => {
+    console.log(reset);
+  }, [reset]);
 
   return (
     <div
@@ -112,7 +153,7 @@ export default function TypedScore({ result, isShowResult }: ITypedScoreProps) {
           </div>
           <Button
             className="h-14 bg-green-500 hover:bg-green-700 text-lg w-52"
-            onClick={() => reset()}
+            onClick={reset}
           >
             <GrPowerReset size={20} /> Thử lại
           </Button>
@@ -124,9 +165,17 @@ export default function TypedScore({ result, isShowResult }: ITypedScoreProps) {
         <div className="px-3">
           <Table>
             <TableCaption>
-              You better than{" "}
-              <span className="text-lg font-medium text-blue-800">90%</span> of
-              people.
+              {!rank.best?.score || result.score > rank.best?.score ? (
+                <p>Congratulation, you just create a new record</p>
+              ) : (
+                <p>
+                  You better than{" "}
+                  <span className="text-lg font-medium text-blue-800">
+                    {calculatePercentage(result.score)}%
+                  </span>{" "}
+                  of people.
+                </p>
+              )}
             </TableCaption>
             <TableHeader>
               <TableRow>
@@ -137,26 +186,16 @@ export default function TypedScore({ result, isShowResult }: ITypedScoreProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Best</TableCell>
-                <TableCell>02:52</TableCell>
-                <TableCell>90%</TableCell>
-                <TableCell className="text-right">162</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">You</TableCell>
-                <TableCell>
-                  <Timer time={result?.time || 0} />
-                </TableCell>
-                <TableCell>{result.wAccuracy}</TableCell>
-                <TableCell className="text-right">{result.score}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Average</TableCell>
-                <TableCell>03:59</TableCell>
-                <TableCell>70%</TableCell>
-                <TableCell className="text-right">124</TableCell>
-              </TableRow>
+              {ranks.map((rank, index) => (
+                <TableRow key={index}>
+                  <TableCell>{rank?.rank || "Your"}</TableCell>
+                  <TableCell>
+                    <Timer time={rank.time || 0} />
+                  </TableCell>
+                  <TableCell>{rank.wAccuracy}%</TableCell>
+                  <TableCell className="text-right">{rank.score}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

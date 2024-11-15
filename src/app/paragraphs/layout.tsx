@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import MainLayout from "@/layouts/main.layout";
 import Image from "next/image";
 import * as React from "react";
 import { HiMiniFire } from "react-icons/hi2";
@@ -17,6 +18,20 @@ export interface ISpeedTestLayoutProps {
 }
 
 export default function ParagraphsLayout(props: ISpeedTestLayoutProps) {
+  return <MainLayout>{props.children}</MainLayout>;
+
+  return (
+    <div className="flex h-screen w-screen">
+      <div className="h-full">
+        <CommonSideBar />
+      </div>
+      <div className="flex-1 bg-[#d5ddff] flex flex-col">
+        <Header />
+        {props.children}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex h-screen w-screen">
       <div>
