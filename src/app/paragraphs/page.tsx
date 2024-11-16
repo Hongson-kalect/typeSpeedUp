@@ -183,16 +183,16 @@ const ParagraphsList = () => {
               Title
             </th>
             <th className="px-2 min-w-[80px] text-sm text-left font-normal">
-              length
+              Length
             </th>
-            <th className="px-2 min-w-[80px] text-sm font-normal">độ khó</th>
+            <th className="px-2 min-w-[80px] text-sm font-normal">Level</th>
             <th className="px-2 min-w-[80px] text-sm  font-normal">
-              completed
+              Completed
             </th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">state</th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">voted</th>
+            <th className="px-2 min-w-[80px] text-sm  font-normal">State</th>
+            <th className="px-2 min-w-[80px] text-sm  font-normal">Voted</th>
             <th className="px-2 min-w-[80px] text-sm  font-normal">
-              upload at
+              Upload at
             </th>
             {/* <th>total</th> */}
           </tr>

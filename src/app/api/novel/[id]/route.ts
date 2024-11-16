@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 import { getRequestId, IdParamType } from "../../_service";
+import { EJSON } from "bson";
+import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +12,26 @@ export async function GET(
   { params }: { params: IdParamType }
 ) {
   const id = await getRequestId(params);
+
+  const novelWithLikes = await prisma.$runCommandRaw({
+    aggregate: "Novel",
+    pipeline: [
+      {
+        $match: {
+          _id: new ObjectId(id),
+        },
+      },
+    ],
+    cursor: {},
+  });
+
+  const matchedItems = novelWithLikes?.cursor?.firstBatch[0];
+  console.log("matchItems :>> ", id, novelWithLikes);
+  console.log("ID:", id);
+  console.log("Is valid ObjectId:", ObjectId.isValid(id));
+  // const novels = EJSON.deserialize({ ...matchedItems, id: matchedItems._id });
+
+  return NextResponse.json(matchedItems);
 
   const items = await prisma.novel.findUnique({
     where: { id },

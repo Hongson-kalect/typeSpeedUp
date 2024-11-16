@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import * as React from "react";
-import { BiTrendingUp } from "react-icons/bi";
+import { BiBook, BiTrendingUp } from "react-icons/bi";
 import { IoSearchOutline } from "react-icons/io5";
 import { MdEditNote } from "react-icons/md";
 
@@ -30,6 +30,11 @@ export const CommonSideBar = () => {
           icon={<MdEditNote size={22} />}
           title="Type paragraphs"
           href="/paragraphs"
+        />
+        <SideBarItem
+          icon={<BiBook size={22} />}
+          title="Novel list"
+          href="/novel"
         />
         <SideBarItem
           icon={<BiTrendingUp size={22} />}
