@@ -13,42 +13,119 @@ export async function GET(
 ) {
   const id = await getRequestId(params);
 
-  const novelWithLikes = await prisma.$runCommandRaw({
+  const novelRaw = await prisma.$runCommandRaw({
     aggregate: "Novel",
     pipeline: [
+      { $match: { $expr: { $eq: ["$_id", { $toObjectId: id }] } } },
       {
-        $match: {
-          _id: new ObjectId(id),
+        $lookup: {
+          from: "Like",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "likeCount",
+          pipeline: [{ $match: { type: "novel", isDeleted: false } }],
+        },
+      },
+      {
+        $lookup: {
+          from: "Favorite",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "favoriteCount",
+          pipeline: [{ $match: { type: "novel", isDeleted: false } }],
+        },
+      },
+      {
+        $lookup: {
+          from: "Paragraph",
+          localField: "_id",
+          foreignField: "novelId",
+          as: "paragraphss",
+          pipeline: [
+            { $match: { isDeleted: false } },
+            { $sort: { chapter: 1 } }, // Sort scores in descending order
+            // { $limit: 10 },
+            // {
+            //   $facet: {
+            //     lastChapterss: [
+            //       { $sort: { chapter: -1 } },
+            //       { $limit: 10 },
+            //     ],
+            //     firstChapters: [
+            //       { $sort: { chapter: 1 } },
+            //       { $limit: 1 }
+            //     ]
+            //   }
+
+            // }
+          ],
+        },
+      },
+      // {
+      //   $lookup: {
+      //     from: "Paragraph",
+      //     localField: "_id",
+      //     foreignField: "novelId",
+      //     as: "lastChapters",
+      //     pipeline: [
+      //       { $match: { isDeleted: false } },
+      //       { $sort: { chapter: -1 } }, // Sort scores in descending order
+      //       { $limit: 1 },
+      //     ],
+      //   },
+      // },
+      {
+        $lookup: {
+          from: "Paragraph",
+          localField: "_id",
+          foreignField: "novelId",
+          as: "firstChapters",
+          pipeline: [
+            { $match: { isDeleted: false } },
+            { $sort: { chapter: 1 } }, // Sort scores in descending order
+            { $limit: 1 },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          like: { $size: "$likeCount" },
+          favorite: { $size: "$favoriteCount" },
+          paragraphs: "$paragraphss",
+          // lastChapter: "$lastChapters",
+          firstChapter: "$firstChapters",
+        },
+      },
+      {
+        $project: {
+          likeCount: 0, // Exclude the likes array from the final result
+          favoriteCount: 0, // Exclude the likes array from the final result
+          paragraphss: 0, // Exclude the likes array from the final result
+          // lastChapters: 0, // Exclude the likes array from the final result
+          firstChapters: 0, // Exclude the likes array from the final result
+          // likeCount: 1, // Include the likeCount field in the final result
         },
       },
     ],
     cursor: {},
   });
 
-  const matchedItems = novelWithLikes?.cursor?.firstBatch[0];
-  console.log("matchItems :>> ", id, novelWithLikes);
-  console.log("ID:", id);
-  console.log("Is valid ObjectId:", ObjectId.isValid(id));
-  // const novels = EJSON.deserialize({ ...matchedItems, id: matchedItems._id });
+  console.log(
+    "novelRaw?.cursor?.firstBatch[0] :>> ",
+    novelRaw?.cursor?.firstBatch[0]
+  );
 
-  return NextResponse.json(matchedItems);
-
-  const items = await prisma.novel.findUnique({
-    where: { id },
-    // include: { user: true },
-  });
-  const lastChapter = await prisma.paragraph.findFirst({
-    take: 1,
-    where: {
-      novelId: id,
-    },
-    orderBy: {
-      chapter: "desc",
-    },
+  const matchedItems = novelRaw?.cursor?.firstBatch[0];
+  const novel = EJSON.deserialize({
+    ...matchedItems,
+    id: matchedItems._id,
+    // lastChapter: matchedItems.lastChapter[0],
+    firstChapter: matchedItems.firstChapter[0],
   });
 
-  items.lastChapter = lastChapter?.chapter;
-  return NextResponse.json(items);
+  console.log("novel :>> ", novel);
+
+  return NextResponse.json(novel);
 }
 
 export async function PUT(

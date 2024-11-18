@@ -25,7 +25,10 @@ export default function MainLayout(props: ILayoutProps) {
       <div className="h-full">
         <CommonSideBar />
       </div>
-      <div className="flex-1 flex flex-col" style={{ background: "#d5ddff" }}>
+      <div
+        className="flex-1 flex flex-col h-full"
+        style={{ background: "#d5ddff" }}
+      >
         <Header />
         {props.children}
       </div>

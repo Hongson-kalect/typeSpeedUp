@@ -32,6 +32,7 @@ export type ResultType = {
 };
 
 export type ParaInfoType = {
+  _id: string;
   id: string;
   language: LanguageInfoType;
   header: string;
@@ -52,10 +53,11 @@ export type ParaInfoType = {
 };
 
 export type NovelInfoType = {
+  _id: string;
+  id: string;
   createdAt: string;
   defaultLanguageId: string;
   desc?: string;
-  id: string;
   status: string;
   isDeleted: boolean;
   isPrivate: boolean;
@@ -66,7 +68,10 @@ export type NovelInfoType = {
   favorite: number;
   tag: string;
   unit: string;
-  lastChapter: number | string;
+  chapterCount: number | string;
+  firstChapter: ParaInfoType;
+  lastChapter: ParaInfoType;
+  paragraphs?: ParaInfoType[];
   updatedAt: string;
   userId: string;
 };
