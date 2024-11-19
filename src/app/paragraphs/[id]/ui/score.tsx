@@ -52,6 +52,7 @@ export default function TypedScore({
   }, [rank, result]);
 
   function calculatePercentage(value: number) {
+    let returnValue = 50;
     if (!rank.average || !rank.best) return 50;
     const average = rank.average.score;
     const best = rank.best.score;
@@ -59,18 +60,17 @@ export default function TypedScore({
     const range = best - average;
 
     if (value === average) {
-      return 50;
+      return returnValue;
     } else {
       // Tính toán phần trăm tăng với tỷ lệ cao hơn cho các giá trị gần trung bình
       const diff = value - average;
       if (diff > 0) {
-        return 50 + Math.floor(50 * Math.pow(diff / range, 1 / 3) * 10) / 10;
+        returnValue = 50 + 50 * Math.pow(diff / range, 1 / 3);
       } else {
-        const cal =
-          50 -
-          Math.floor(80 * Math.pow(Math.abs(diff) / average, 1 / 3) * 10) / 10;
-        return cal > 5 ? cal : 5;
+        returnValue = 50 - 80 * Math.pow(Math.abs(diff) / average, 1 / 3);
       }
+
+      return Math.floor(returnValue * 10) / 10;
     }
   }
 
