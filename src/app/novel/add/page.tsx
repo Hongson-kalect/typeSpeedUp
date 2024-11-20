@@ -1,83 +1,76 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import * as React from "react";
-import { BiEdit, BiLeftArrow } from "react-icons/bi";
-import { useNovelStore } from "../../_utils/store";
-import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
+import { useMainStore } from "@/layouts/main.store";
 import axios from "axios";
-import { toast } from "react-toastify";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import * as React from "react";
+import { BiLeftArrow, BiPlus } from "react-icons/bi";
+import { toast } from "react-toastify";
 
-export default function EditNovelPage() {
-  const { selectedNovel } = useNovelStore();
+export default function CreateNovelPage() {
   //keep novel by zustand will be the best
 
   return (
     <div className="px-6 py-3 flex-1 flex flex-col min-h-0 hide-scrollbar">
-      <Link href={`/novel/${selectedNovel?.id || selectedNovel?._id}`}>
+      <Link href={`/novel`}>
         <div className="flex gap-4 text-gray-600 items-center">
           <BiLeftArrow />
-          <h2 className="font-bold cursor-pointer">{"Novel Name"}</h2>
+          <h2 className="font-bold cursor-pointer">{"Novel List"}</h2>
         </div>
       </Link>
       {/* <div className="flex gap-4 pt-1 flex-1 overflow-auto bg-white"> */}
       <div className=" bg-white rounded-lg px-4 py-3 flex-1">
         <h1 className="text-xl font-bold text-gray-800 text-center">
-          Edit Paragraph
+          Create Novel
         </h1>
         <div className="mt-2">
-          <EditNovel />
+          <CreateNovel />
         </div>
       </div>
     </div>
   );
 }
 
-//Edit para may have fixed width
-const EditNovel = () => {
+//Add para may have fixed width
+const CreateNovel = () => {
   const router = useRouter();
+  const { userInfo } = useMainStore();
 
-  const { selectedNovel, setSelectedNovel } = useNovelStore();
-  const [editNovel, setEditNovel] = React.useState(selectedNovel);
+  const [novelInfo, setNovelInfo] = React.useState({
+    name: "",
+    isPrivate: false,
+    desc: "",
+  });
 
-  const handleEditNovel = async () => {
-    if (!editNovel) return;
-    const res = await axios.put(`/api/novel/${editNovel._id || editNovel.id}`, {
-      name: editNovel.name,
-      desc: editNovel.desc,
-      // isPrivate: editNovel.isPrivate, // chưa có cái này
+  const createNovel = async () => {
+    console.log("userInfo?.language?.id :>> ", userInfo?.language?.id);
+
+    await axios.post("/api/novel", {
+      ...novelInfo,
+      userId: userInfo?.id,
+      languageId: userInfo?.language?.id,
     });
-
-    if (res.data) {
-      toast.success("Edit Novel Success");
-      setSelectedNovel({ ...selectedNovel, ...res.data });
-      router.back();
-    }
+    toast.success("Create Novel Success");
+    router.back();
   };
 
-  if (!editNovel)
-    return (
-      <div>
-        <p>No Novel Selected</p>
-      </div>
-    );
-
   return (
-    <div className="px-6 py-3 flex-1 flex flex-col min-h-0 hide-scrollbar">
+    <div className="px-6 py-3 flex-1 flex flex-col min-h-0 hide-scrollbar bg-white">
       <div className="flex flex-col gap-5">
         <div className="flex items-center space-x-2">
           <p className="text-lg text-gray-700">Status:</p>
           <Checkbox
             id="private"
-            checked={editNovel.isPrivate}
+            checked={novelInfo.isPrivate}
             onCheckedChange={(checked) => {
               console.log("checked :>> ", checked);
-              setEditNovel({
-                ...editNovel,
+              setNovelInfo({
+                ...novelInfo,
                 isPrivate: !!checked,
               });
             }}
@@ -94,9 +87,9 @@ const EditNovel = () => {
           <p className="text-lg text-gray-700">Name:</p>
           <Input
             className="mt-1"
-            value={editNovel.name}
+            value={novelInfo.name}
             onChange={(e) =>
-              setEditNovel({ ...editNovel, name: e.target.value })
+              setNovelInfo({ ...novelInfo, name: e.target.value })
             }
           />
         </div>
@@ -105,9 +98,9 @@ const EditNovel = () => {
           <p>Description:</p>
           <Textarea
             rows={10}
-            value={editNovel.desc}
+            value={novelInfo.desc}
             onChange={(e) =>
-              setEditNovel({ ...editNovel, desc: e.target.value })
+              setNovelInfo({ ...novelInfo, desc: e.target.value })
             }
             className="resize-none mt-1"
           />
@@ -115,12 +108,12 @@ const EditNovel = () => {
 
         <div className="mt-5 text-center">
           <Button
-            onClick={handleEditNovel}
+            onClick={createNovel}
             size={"lg"}
             className="w-1/2 bg-orange-600 hover:bg-orange-700"
           >
-            <BiEdit />
-            <p className="text-lg">Update Novel</p>
+            <BiPlus />
+            <p className="text-lg">Create Novel</p>
           </Button>
         </div>
       </div>

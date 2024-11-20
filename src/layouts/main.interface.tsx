@@ -153,7 +153,7 @@ export interface IParagraph {
   header: string;
   content: string;
   desc: string;
-  chapter?: string;
+  chapter?: string | number;
   rate: number;
   rateTime: number;
   prev?: string;
@@ -330,6 +330,7 @@ export interface IWordRate {
 export interface IAppUser {
   isDeleted: boolean;
   id: string;
+  language?: ILanguage;
   username?: string;
   password?: string;
   scope: string;
@@ -367,6 +368,7 @@ export interface IUser {
   sessions: ISession[];
   Authenticator: IAuthenticator[];
   appUser?: IAppUser;
+  language?: ILanguage;
   createdAt: Date;
   updatedAt: Date;
 }

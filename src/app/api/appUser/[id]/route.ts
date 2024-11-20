@@ -10,7 +10,9 @@ export async function GET(
 ) {
   const id = await getRequestId(params);
 
-  const items = await prisma.appUser.findUnique({ where: { id } });
+  const items = await prisma.appUser.findUnique({
+    where: { id },
+  });
   return NextResponse.json(items);
 }
 
@@ -18,12 +20,19 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: IdParamType }
 ) {
-  const id = await getRequestId(params);
-
+  const reqId = await getRequestId(params);
   const requestBody = await request.json();
+
+  const { id, _id, ...editContent } = requestBody;
+  // const editedItem = await prisma.novel.update({
+  //   where: { id: reqId },
+  //   data: editContent,
+  // });
+  console.log("editContent :>> ", editContent);
+
   const editedItem = await prisma.appUser.update({
-    where: { id },
-    data: requestBody,
+    where: { id: reqId },
+    data: editContent,
   });
   return NextResponse.json(editedItem);
 }

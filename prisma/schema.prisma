@@ -84,6 +84,7 @@ model Language {
   flag  String
   desc  String?
   gameInfo GameInfo[]
+  appUser AppUser[]
   paragraphs Paragraph[]
   gameDefaultLanguage Game[]
   novelDefaultLanguage Novel[]
@@ -134,8 +135,8 @@ model Paragraph {
   completed Int @default(0)
   userId    String  @db.ObjectId
   user      AppUser    @relation(fields: [userId], references: [id])
-  novelId String @db.ObjectId
-  novel Novel @relation(fields: [novelId], references: [id])
+  novelId String? @db.ObjectId
+  novel Novel? @relation(fields: [novelId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -331,6 +332,8 @@ model AppUser {
   setting       Setting?  @relation(fields: [settingId], references: [id])
   assetId       String?   @db.ObjectId @unique
   asset         Asset?    @relation(fields: [assetId], references: [id])
+  languageId    String?    @db.ObjectId() @unique
+  language      Language?   @relation(fields: [languageId], references: [id])
   devices       Device[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

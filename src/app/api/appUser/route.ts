@@ -29,17 +29,17 @@ export async function POST(request: Request) {
       // score: true,
       setting: true,
       user: true,
+      language: true,
     },
   });
 
-  console.log("appUser", appUser);
   if (appUser) {
     return NextResponse.json(appUser);
     // prisma.appUser.update({ where: { id: appUser.id }, data: { userId } });
   } else {
-    console.log("Zo đây :");
-    const newAppUser = await prisma.appUser.create({ data: { userId } });
-    console.log("newAppUser :>> ", newAppUser);
+    const newAppUser = await prisma.appUser.create({
+      data: { userId, languageId: "67248fd727abec39d88c5f70" },
+    });
     return NextResponse.json(newAppUser);
   }
 

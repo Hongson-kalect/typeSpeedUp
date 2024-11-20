@@ -31,6 +31,7 @@ export async function POST(request: Request) {
             { name: { $regex: requestBody.keyword, $options: "i" } }, // Case-insensitive match for name
             { description: { $regex: requestBody.keyword, $options: "i" } }, // Case-insensitive match for description
           ],
+          isDeleted: false,
         },
       },
       {

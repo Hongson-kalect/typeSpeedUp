@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import * as React from "react";
 import { CiSearch } from "react-icons/ci";
-import { FaUnlock, FaUser } from "react-icons/fa";
+import { FaLock, FaUnlock, FaUser } from "react-icons/fa";
 import { IoIosPricetags, IoMdStar } from "react-icons/io";
 import { PiPlus } from "react-icons/pi";
 import { RiHistoryFill } from "react-icons/ri";
@@ -37,7 +37,7 @@ export interface IParagraphsPageProps {}
 
 export default function ParagraphsPage(props: IParagraphsPageProps) {
   return (
-    <div className="px-6 pt-6 flex-1 flex flex-col">
+    <div className="px-6 pt-6 flex-1 flex flex-col overflow-auto">
       <div>
         <Header />
       </div>
@@ -117,7 +117,7 @@ const ParagraphsList = () => {
   const { getParagraph } = useParagraphQuery();
 
   return (
-    <div className="bg-white rounded-lg p-4 flex flex-col">
+    <div className="bg-white rounded-lg p-4 flex flex-col h-full overflow-auto">
       <div className="filter rounded-3xl flex items-center justify-between">
         <div
           className="search bg-gray-100 flex items-center gap-4 rounded-full px-6 w-80"
@@ -171,37 +171,37 @@ const ParagraphsList = () => {
         </div>
       </div>
 
-      <table className="mt-6 min-w-[700px] w-full flex-1">
-        <tbody>
-          <tr className="text-gray-700 [&_th]:py-3 bg-gray-200">
-            <th>
-              <div className="flex items-center justify-center pl-4 pr-2">
-                <IoIosPricetags size={16} color="orange" />
-              </div>
-            </th>
-            <th className="px-2 min-w-[80px] text-sm text-left font-normal">
-              Title
-            </th>
-            <th className="px-2 min-w-[80px] text-sm text-left font-normal">
-              Length
-            </th>
-            <th className="px-2 min-w-[80px] text-sm font-normal">Level</th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">
-              Completed
-            </th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">State</th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">Voted</th>
-            <th className="px-2 min-w-[80px] text-sm  font-normal">
-              Upload at
-            </th>
-            {/* <th>total</th> */}
-          </tr>
+      <div className="flex-1 overflow-auto my-6">
+        <table className="min-w-[700px] w-full flex-1">
+          <tbody>
+            <tr className="text-gray-700 [&_th]:py-3 bg-gray-200 sticky top-0 z-10">
+              <th>
+                <div className="flex items-center justify-center pl-4 pr-2">
+                  <IoIosPricetags size={16} color="orange" />
+                </div>
+              </th>
+              <th className="px-2 min-w-[80px] text-sm text-left font-normal">
+                Title
+              </th>
+              <th className="px-2 min-w-[80px] text-sm font-normal">Length</th>
+              <th className="px-2 min-w-[80px] text-sm font-normal">Level</th>
+              <th className="px-2 min-w-[80px] text-sm font-normal">
+                Completed
+              </th>
+              <th className="px-2 min-w-[80px] text-sm  font-normal">State</th>
+              <th className="px-2 min-w-[80px] text-sm  font-normal">Voted</th>
+              <th className="px-2 min-w-[80px] text-sm  font-normal">
+                Upload at
+              </th>
+              {/* <th>total</th> */}
+            </tr>
 
-          {getParagraph.data?.map((item, index) => {
-            return <ParaItem {...item} key={index} />;
-          })}
-        </tbody>
-      </table>
+            {getParagraph.data?.map((item, index) => {
+              return <ParaItem {...item} key={index} />;
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* <Keyboard /> */}
     </div>
@@ -235,12 +235,18 @@ const ParaItem = (props: IParagraphItem) => {
           <IoIosPricetags size={20} color="#aaa " />
         </div>
       </td>
-      <td className="text-green-500 font-medium px-2">
+      <td>
         <div>
+          {props.novel && (
+            <div className="text-xs text-gray-400 font-extralight flex gap-2">
+              <p>Chapter {props.chapter}</p>
+              <p>{props.novel.name}</p>
+            </div>
+          )}
           <h3 className="line-clamp-1 text-gray-800 font-bold">
             {props.header}
           </h3>
-          <p className="text-gray-400 text-xs line-clamp-1">{props.content}</p>
+          <p className="text-gray-600 text-sm line-clamp-1">{props.content}</p>
         </div>
       </td>
       <td className="text-left">
@@ -263,12 +269,27 @@ const ParaItem = (props: IParagraphItem) => {
         </div>
       </td>
       <td>
-        <p className="text-center text-sm font-semibold text-gray-500">124</p>
+        <p
+          className={`${
+            props.completed ? " text-gray-700" : "text-sm text-gray-400"
+          } text-center font-semibold`}
+        >
+          {props.completed || "-"}
+        </p>
       </td>
       <td className="text-sm text-center">
         <div className="flex flex-col items-center justify-center">
-          <FaUnlock className="text-green-500" />
-          <p className="text-green-700 text-xs">Public</p>
+          {props.isPrivate ? (
+            <>
+              <FaLock className="text-red-500" />
+              <p className="text-red-700 text-xs">Privated</p>
+            </>
+          ) : (
+            <>
+              <FaUnlock className="text-green-500" />
+              <p className="text-green-700 text-xs">Public</p>
+            </>
+          )}
         </div>
       </td>
       <td className="text-sm text-center">

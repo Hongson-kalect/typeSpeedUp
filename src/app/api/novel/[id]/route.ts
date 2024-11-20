@@ -132,12 +132,14 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: IdParamType }
 ) {
-  const id = await getRequestId(params);
+  const reqId = await getRequestId(params);
 
   const requestBody = await request.json();
+
+  const { id, _id, ...editContent } = requestBody;
   const editedItem = await prisma.novel.update({
-    where: { id },
-    data: requestBody,
+    where: { id: reqId },
+    data: editContent,
   });
   return NextResponse.json(editedItem);
 }

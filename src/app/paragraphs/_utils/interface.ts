@@ -1,4 +1,5 @@
 import { ILanguageItem } from "@/app/language/_utils/interface";
+import { INovel } from "@/layouts/main.interface";
 
 export type IParagraphItem = {
   isDeleted?: boolean;
@@ -8,12 +9,15 @@ export type IParagraphItem = {
   header: string;
   content: string;
   desc: string;
+  chapter?: string;
   rate: string;
   rateTime: string;
   userId: string;
+  completed?: number;
+  isPrivate?: boolean;
   // user      User
-  novelId: string;
-  // novel Novel
+  novelId?: string;
+  novel?: INovel;
   createdAt?: Date;
   updatedAt?: Date;
 };

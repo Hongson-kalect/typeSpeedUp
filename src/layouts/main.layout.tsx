@@ -40,21 +40,53 @@ export default function MainLayout(props: ILayoutProps) {
 
 const Header = () => {
   const { data: session } = useSession();
-  const { setUserInfo } = useMainStore();
+  const {
+    userInfo,
+    languages,
+    setUserInfo,
+    setLanguages,
+    userLanguage,
+    setUserLanguage,
+  } = useMainStore();
 
-  const addUser = async () => {
-    console.log("session", session);
+  const getUser = async () => {
     if (!session) return;
     const res = await axios.post("/api/appUser", session.user);
     console.log("res :>> ", res);
+    if (res.data.language) setUserLanguage(res.data.language);
     setUserInfo(res.data);
+  };
+
+  const getLanguage = async () => {
+    const res = await axios.get("/api/language");
+    setLanguages(res.data);
+  };
+
+  const changeLanguage = (langId: string) => {
+    const item = languages?.find((item) => item.id === langId);
+    if (item) setUserLanguage(item);
   };
 
   React.useEffect(() => {
     console.log("Get User data");
-    // addUser
-    addUser();
+    // getUser
+    getUser();
   }, [session]);
+
+  React.useEffect(() => {
+    // get language
+    getLanguage();
+  }, []);
+
+  React.useEffect(() => {
+    if (userInfo?.language && userLanguage !== userInfo?.language) {
+      axios.put("/api/appUser/" + userInfo?.id, {
+        languageId: userLanguage?.id,
+      });
+    }
+    if (userLanguage && userInfo)
+      setUserInfo({ ...userInfo, language: userLanguage });
+  }, [userLanguage]);
 
   console.log("session ádasdasdasd:>> ", session);
   return (
@@ -71,14 +103,22 @@ const Header = () => {
           </span>
         </div>
         <div className="language h-7 w-16 bg-gray-400 rounded"></div>
-        <Select defaultValue="vi">
+        <Select
+          value={`${userLanguage?.id || "67248fd727abec39d88c5f70"}`}
+          onValueChange={(e) => changeLanguage(e)}
+        >
           <SelectTrigger className="w-[120px] h-8 border-none outline-none !ring-0">
             <SelectValue placeholder="Theme" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="vi">Viet Nam</SelectItem>
+            {languages?.map((item, index) => (
+              <SelectItem key={index} value={item.id}>
+                {item.name}
+              </SelectItem>
+            ))}
+            {/* <SelectItem value="vi">Viet Nam</SelectItem>
             <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
+            <SelectItem value="system">System</SelectItem> */}
           </SelectContent>
         </Select>
 

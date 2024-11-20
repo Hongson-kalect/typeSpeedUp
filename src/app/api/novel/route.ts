@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { use } from "react";
 
 const prisma = new PrismaClient();
 
@@ -25,28 +24,16 @@ export async function POST(request: Request) {
     unit: "",
     desc: "",
   };
+  const { name, desc, userId, languageId } = requestBody;
 
-  const initPara = {
-    languageId: requestBody?.language || null,
-    header: "",
-    content: "",
-    desc: "",
-    chapter: "0",
-    rate: 0,
-    rateTime: 0,
-    userId: "6729d611fbf2f5f41beddcd0", //useri Id phake
-    novelId: "test novel",
-  };
-
-  const { header, title, content } = requestBody;
-
-  const newItem = await prisma.novel.create({
-    data: { ...initNovel, name: header },
+  const newNovel = await prisma.novel.create({
+    data: {
+      ...initNovel,
+      name,
+      desc,
+      userId,
+      defaultLanguageId: languageId,
+    },
   });
-
-  initPara.novelId = newItem.id;
-  const newParagraphs = await prisma.paragraph.create({
-    data: { ...initPara, header: title, content },
-  });
-  return NextResponse.json({ ...newItem, paragraphs: newParagraphs });
+  return NextResponse.json(newNovel);
 }

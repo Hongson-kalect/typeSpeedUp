@@ -1,12 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -14,15 +8,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import { PiPlus } from "react-icons/pi";
 import { useNovelStore } from "../_utils/store";
 
 export const Header = () => {
-  const [date, setDate] = React.useState(new Date());
-  const [isRange, setIsRange] = React.useState(false);
   const { novelFilter, setNovelFilter } = useNovelStore();
 
   return (
@@ -106,7 +97,7 @@ export const Header = () => {
         </Popover> */}
       </div>
       <div>
-        <Link href="/paragraphs/add">
+        <Link href="/novel/add">
           <Button className="bg-blue-600 hover:bg-blue-800">
             <PiPlus /> <p>Add novel</p>
           </Button>

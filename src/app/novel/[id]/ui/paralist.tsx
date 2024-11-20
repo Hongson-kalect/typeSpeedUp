@@ -31,7 +31,7 @@ export default function ParaList({ paragraphs }: IParaListProps) {
               <Link className="" href={`/paragraphs/${item.id || item._id}`}>
                 <p className="text-sm text-gray-700">
                   Chapter: {item.chapter} -
-                  <span className="text-lg font-medium"> {item.header}</span>
+                  <span className="font-medium"> {item.header}</span>
                 </p>
                 <div className="flex px-2 items-center justify-between text-xs mt-1 text-gray-500">
                   <p>
