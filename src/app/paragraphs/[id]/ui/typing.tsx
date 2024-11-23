@@ -12,6 +12,9 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { RiTimerLine } from "react-icons/ri";
 import { ResultType } from "../../_utils/interface";
 import { Textarea } from "@/components/ui/textarea";
+import { useParagraphStore } from "../../_utils/store";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export interface ITypingAreaProps {
   setResult: React.Dispatch<React.SetStateAction<ResultType>>;
@@ -34,10 +37,12 @@ export default function TypingArea({
   setUserTyped,
   setReset,
 }: ITypingAreaProps) {
+  // const {selectedPara} =useParagraphStore()
+  const params = useParams();
+
   const paraArr = React.useMemo(() => {
     return para?.split(" ") || [];
   }, [para]);
-
   const [userInput, setUserInput] = React.useState("");
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
   const userInputArr = React.useMemo(() => userInput.split(" "), [userInput]);
@@ -206,17 +211,24 @@ export default function TypingArea({
         <div className="flex gap-2 items-center">
           <p className="text-gray-600">{language}</p>
           <CiEdit size={18} />
-          <Button onClick={() => setIsShowResult(!isShowResult)}>
+          {/* <Button onClick={() => setIsShowResult(!isShowResult)}>
             Toogle Result
-          </Button>
+          </Button> */}
         </div>
-        <div className="setting flex items-end gap-1">
-          <IoSettingsOutline size={20} className="text-gray-500 mb-1" />
-          <p className="h-7 rounded-lg bg-green-500 text-white px-3 mb-1 flex items-center justify-center">
+        <div className="setting flex items-end gap-1 mb-0.5">
+          <Link href={`/paragraphs/${params.id}/edit`}>
+            <Button size={"sm"} className="bg-orange-500 hover:bg-orange-600">
+              <CiEdit />
+              <p>Edit</p>
+            </Button>
+          </Link>
+          {/* <p className="h-7 rounded-lg bg-green-500 text-white px-3 mb-1 flex items-center justify-center">
             Dễ
-          </p>
+          </p> */}
           <RiTimerLine size={20} className="text-gray-500 ml-2 mb-1" />
           <Timer time={time} />
+
+          <IoSettingsOutline size={20} className="text-gray-500 mb-1" />
         </div>
       </div>
       <div

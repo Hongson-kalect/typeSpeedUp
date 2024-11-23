@@ -18,7 +18,7 @@ export default function NovelInfo({ novel }: INovelInfoProps) {
   console.log("novel :>> ", novel);
   if (!novel)
     return (
-      <div className="bg-white rounded-lg pr-4 pl-6 py-3 flex-1 pt-8">
+      <div className="bg-white rounded-lg pr-4 pl-6 py-3 flex-1 pt-4">
         <div>Loading...</div>
       </div>
     );
@@ -37,7 +37,7 @@ export default function NovelInfo({ novel }: INovelInfoProps) {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="bg-white rounded-lg pr-4 pl-6 py-3 flex flex-col flex-1 h-full pt-8 overflow-auto hide-scroll">
+      <div className="bg-white rounded-lg pr-4 pl-6 py-3 flex flex-col flex-1 h-full pt-4 overflow-auto hide-scroll">
         <div className="preview-image">
           <div className="max-h-[200px] w-[400px] h-screen max-w-[80%] bg-gray-400">
             preview-image

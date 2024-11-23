@@ -31,7 +31,7 @@ export async function PUT(
   console.log("editContent :>> ", editContent);
 
   const editedItem = await prisma.appUser.update({
-    where: { id: reqId },
+    where: { id: Number(reqId) },
     data: editContent,
   });
   return NextResponse.json(editedItem);

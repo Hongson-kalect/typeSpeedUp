@@ -70,6 +70,9 @@ export default function TypedScore({
         returnValue = 50 - 80 * Math.pow(Math.abs(diff) / average, 1 / 3);
       }
 
+      if (returnValue === 100) return 99.99;
+      if (returnValue < 0) return 0.1;
+
       return Math.floor(returnValue * 10) / 10;
     }
   }

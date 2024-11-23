@@ -59,6 +59,7 @@ const Header = () => {
 
   const getLanguage = async () => {
     const res = await axios.get("/api/language");
+    if (res.data?.[0] && !userLanguage) setUserLanguage(res.data?.[0]);
     setLanguages(res.data);
   };
 
@@ -102,9 +103,13 @@ const Header = () => {
             2
           </span>
         </div>
-        <div className="language h-7 w-16 bg-gray-400 rounded"></div>
+        <img
+          src={userLanguage?.flag}
+          alt="flag"
+          className="bg-gray-400 rounded h-7 w-12"
+        />
         <Select
-          value={`${userLanguage?.id || "67248fd727abec39d88c5f70"}`}
+          value={userLanguage?.id || ""}
           onValueChange={(e) => changeLanguage(e)}
         >
           <SelectTrigger className="w-[120px] h-8 border-none outline-none !ring-0">

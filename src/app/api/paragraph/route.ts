@@ -27,7 +27,6 @@ export async function POST(request: Request) {
 
   const initPara = {
     languageId: requestBody?.language || null,
-    header: "",
     content: "",
     desc: "",
     chapter: "0",
@@ -35,7 +34,7 @@ export async function POST(request: Request) {
     // novelId: "test novel",
   };
 
-  const { title, content } = requestBody;
+  // const { title, content } = requestBody;
 
   // const newItem = await prisma.novel.create({
   //   data: { ...initNovel, name: header },
@@ -43,7 +42,7 @@ export async function POST(request: Request) {
 
   // initPara.novelId = newItem.id;
   const newParagraphs = await prisma.paragraph.create({
-    data: { ...initPara, header: title, content },
+    data: { ...initPara, ...requestBody },
   });
   return NextResponse.json(newParagraphs);
 }

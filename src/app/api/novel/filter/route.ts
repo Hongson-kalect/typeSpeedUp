@@ -4,83 +4,61 @@ import { EJSON } from "bson";
 
 const prisma = new PrismaClient();
 
+
 export async function POST(request: Request) {
-  //get request body
+  // Get request body
   const requestBody = await request.json();
 
   console.log("requestBody :>> ", requestBody);
 
-  {
-  }
   if (requestBody.userId) {
     console.log("search novel by userId");
   }
-  if (requestBody.rencent) {
+  if (requestBody.recent) {
     console.log("search novel by history table");
   }
   if (requestBody.favorite) {
     console.log("search novel favorite");
   }
 
-  const novelWithLikes = await prisma.$runCommandRaw({
-    aggregate: "Novel",
-    pipeline: [
-      {
-        $match: {
-          $or: [
-            { name: { $regex: requestBody.keyword, $options: "i" } }, // Case-insensitive match for name
-            { description: { $regex: requestBody.keyword, $options: "i" } }, // Case-insensitive match for description
-          ],
-          isDeleted: false,
-        },
-      },
-      {
-        $lookup: {
-          from: "Like",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "likeCount",
-          pipeline: [{ $match: { type: "novel", isDeleted: false } }],
-        },
-      },
-      {
-        $lookup: {
-          from: "Favorite",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "favoriteCount",
-          pipeline: [{ $match: { type: "novel", isDeleted: false } }],
-        },
-      },
-      {
-        $addFields: {
-          like: { $size: "$likeCount" },
-          favorite: { $size: "$favoriteCount" },
-        },
-      },
-      {
-        $sort: {
-          [requestBody.sort || "createdAt"]:
-            requestBody.order === "asc" ? 1 : -1,
-        }, // Sort by likeCount in the specified order
-      },
-      {
-        $project: {
-          likeCount: 0, // Exclude the likes array from the final result
-          favoriteCount: 0, // Exclude the likes array from the final result
-          // likeCount: 1, // Include the likeCount field in the final result
-        },
-      },
+  // Build the query
+  const whereClause = {
+    OR: [
+      { name: { contains: requestBody.keyword, mode: "insensitive" } },
+      { desc: { contains: requestBody.keyword, mode: "insensitive" } },
     ],
-    cursor: {},
+    isDeleted: false,
+  };
+
+  // Fetch novels with like and favorite counts
+  const novels = await prisma.novel.findMany({
+    where: whereClause,
+    include: {
+      _count: {
+        select: {
+          like: {
+            where: { type: "novel", isDeleted: false },
+          },
+          favorite: {
+            where: { type: "novel", isDeleted: false },
+          },
+        },
+      },
+    },
+    orderBy: {
+      [requestBody.sort || "createdAt"]:
+        requestBody.order === "asc" ? "asc" : "desc",
+    },
   });
-  const matchedItems = novelWithLikes?.cursor?.firstBatch;
 
-  const novels = matchedItems.map((item) =>
-    EJSON.deserialize({ ...item, id: item._id })
-  );
+  // Map the results to include like and favorite counts
+  const novelsWithCounts = novels.map((novel) => ({
+    ...novel,
+    like: novel._count.like,
+    favorite: novel._count.favorite,
+  }));
 
-  console.log("matchedItems, novels :>> ", matchedItems, novels);
+  console.log("novelsWithCounts :>> ", novelsWithCounts);
 
-  return NextResponse.json(novels);
+  return NextResponse.json(novelsWithCounts);
 }

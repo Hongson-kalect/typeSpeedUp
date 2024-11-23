@@ -6,7 +6,7 @@ export async function getRequestId(params: IdParamType) {
   if (!id || !ObjectId.isValid(id))
     NextResponse.json({ error: "Id invalid or not provided" }, { status: 404 });
 
-  return id;
+  return Number(id) || id;
 }
 
-export type IdParamType = Promise<{ id: string }>;
+export type IdParamType = Promise<{ id: string | number }>;

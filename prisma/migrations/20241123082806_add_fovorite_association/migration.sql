@@ -1,0 +1,8 @@
+-- AddForeignKey
+ALTER TABLE "Favorite" ADD CONSTRAINT "NovelTargetId" FOREIGN KEY ("targetId") REFERENCES "Novel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Favorite" ADD CONSTRAINT "ParagraphTargetId" FOREIGN KEY ("targetId") REFERENCES "Paragraph"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Favorite" ADD CONSTRAINT "ThemeTargetId" FOREIGN KEY ("targetId") REFERENCES "Theme"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

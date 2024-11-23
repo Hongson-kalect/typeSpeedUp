@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   //   data: requestBody,
   // });
   const para = await prisma.paragraph.findFirst({
-    where: { id: requestBody.targetId },
+    where: { id: Number(requestBody.targetId) },
   });
 
   console.log("para :>> ", para);

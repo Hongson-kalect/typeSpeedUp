@@ -18,15 +18,11 @@ export async function POST(request: Request) {
     novelId: "test novel",
   };
 
-  const { header, content, novelId, chapter, desc } = requestBody;
+  // const { header, content, novelId, chapter, desc } = requestBody;
   const newParagraphs = await prisma.paragraph.create({
     data: {
       ...initPara,
-      header,
-      content,
-      novelId: novelId,
-      chapter,
-      desc,
+      ...requestBody,
     },
   });
   return NextResponse.json({ paragraphs: newParagraphs });

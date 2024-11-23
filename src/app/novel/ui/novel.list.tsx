@@ -184,7 +184,7 @@ const NovelItem = (props: NovelInfoType & { favor?: boolean }) => {
 
   return (
     <tr
-      onClick={() => router.push(`/novel/${props._id}`)}
+      onClick={() => router.push(`/novel/${props.id}`)}
       className="text-gray-700 [&_td]:py-3 cursor-pointer hover:bg-blue-100"
       style={{ border: "1px solid #eee" }}
     >
@@ -205,7 +205,9 @@ const NovelItem = (props: NovelInfoType & { favor?: boolean }) => {
         {props.desc ? (
           <p className="text-gray-600 text-sm line-clamp-3">{props.desc}</p>
         ) : (
-          <p className="text-gray-400 text-xs line-clamp-1">"Không có mô tả"</p>
+          <p className="text-gray-400 text-xs line-clamp-1">
+            {'"Không có mô tả"'}
+          </p>
         )}
       </td>
       <td className="text-left">

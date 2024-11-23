@@ -23,6 +23,7 @@ export default function LanguageHandler(props: ILanguageHandlerProps) {
   const [language, setLanguage] = React.useState<ILanguageItem | undefined>({
     name: "",
     code: "",
+    desc: "",
     flag: "",
   });
 

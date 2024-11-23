@@ -14,6 +14,8 @@ export async function POST(request: Request) {
   const requestBody = await request.json();
   const { id: userId } = requestBody; //body từ request
 
+  console.log("userId :>> ", userId);
+
   const appUser = await prisma.appUser.findUnique({
     where: { userId },
     include: {
@@ -38,7 +40,7 @@ export async function POST(request: Request) {
     // prisma.appUser.update({ where: { id: appUser.id }, data: { userId } });
   } else {
     const newAppUser = await prisma.appUser.create({
-      data: { userId, languageId: "67248fd727abec39d88c5f70" },
+      data: { userId, languageId: 1 },
     });
     return NextResponse.json(newAppUser);
   }

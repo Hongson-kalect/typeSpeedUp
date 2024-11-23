@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ILanguageItem } from "./interface";
+import { ILanguageItem, IParagraphItem } from "./interface";
 
 type ILanguageStore = {
   action: "create" | "update";
@@ -11,7 +11,20 @@ type ILanguageStore = {
 export const useLanguageStore = create<ILanguageStore>((set) => ({
   action: "create",
   setAction: (action: "create" | "update") => set({ action }),
+
   selectedLanguage: undefined,
   setSelectedLanguage: (language?: ILanguageItem) =>
     set({ selectedLanguage: language }),
+}));
+
+type IParagraphStore = {
+  selectedPara: IParagraphItem | undefined;
+  setSelectedPara: (para?: IParagraphItem) => void;
+};
+
+export const useParagraphStore = create<IParagraphStore>((set) => ({
+  selectedPara: undefined,
+  setSelectedPara(para) {
+    set({ selectedPara: para });
+  },
 }));

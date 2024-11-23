@@ -57,16 +57,16 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
       const res = await axios.get("/api/paragraph/" + params.id);
       return res.data;
     },
-    queryKey: ["paraInfo"],
+    queryKey: ["paraInfo", params.id],
   });
 
   const novelInfo = useQuery<NovelInfoType>({
     queryFn: async () => {
-      if (!paraInfo?.data?.novelId) return;
+      if (!paraInfo?.data?.novelId) return [];
       const res = await axios.get("/api/novel/" + paraInfo.data.novelId);
       return res.data;
     },
-    queryKey: ["paraInfo", paraInfo],
+    queryKey: ["novelInfo"],
   });
 
   const ranking = useMutation<{
@@ -88,7 +88,7 @@ export default function ParaInfoPage(props: IParaInfoPageProps) {
         userId: userInfo?.id,
 
         type: "Paragraph",
-        targetId: params.id,
+        targetId: Number(params.id),
       });
       return res.data;
     },

@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (userId) {
     const favorite = await prisma.favorite.findMany({
       where: {
-        userId,
+        userId: Number(userId),
         type: "novel",
       },
       select: {

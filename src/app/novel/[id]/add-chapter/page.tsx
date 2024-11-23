@@ -46,7 +46,7 @@ const AddNovelChapter = () => {
   const params = useParams();
 
   const { selectedNovel, setSelectedNovel } = useNovelStore();
-  const { userLanguage } = useMainStore();
+  const { userLanguage, userInfo } = useMainStore();
   const [novel, setNovel] = React.useState({
     header: "",
     content: "",
@@ -68,12 +68,16 @@ const AddNovelChapter = () => {
   });
 
   const handleAddChapter = async () => {
-    if (!novel.content && !novel.header && !novel.chapter) return;
+    if (!userInfo?.id || !userLanguage?.id || !selectedNovel?.id)
+      return alert("No language, novel or user selected");
+    if (!novel.content && !novel.header && !novel.chapter)
+      return alert("All fields are required");
     const res = await axios.post(`/api/novel/add-chapter`, {
       ...novel,
 
       novelId: selectedNovel?._id || selectedNovel?.id,
-      language: userLanguage?.id,
+      languageId: userLanguage?.id,
+      userId: userInfo?.id,
     });
 
     if (res.data) {
@@ -118,6 +122,7 @@ const AddNovelChapter = () => {
         <div>
           <p className="text-lg text-gray-700">Chap number:</p>
           <Input
+            // spellCheck={false}
             className="mt-1"
             value={novel.chapter}
             onChange={(e) => setNovel({ ...novel, chapter: e.target.value })}
@@ -156,7 +161,7 @@ const AddNovelChapter = () => {
           <Button
             onClick={handleAddChapter}
             size={"lg"}
-            className="w-1/2 bg-orange-600 hover:bg-orange-700"
+            className="w-1/2 bg-blue-600 hover:bg-blue-700"
           >
             <PiPlus />
             <p className="text-lg">Add Chapter</p>
