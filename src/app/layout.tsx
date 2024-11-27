@@ -6,6 +6,7 @@ import { SessionProvider, getSession } from "next-auth/react";
 import ReactQueryProvider from "@/providers/reactQuery.provider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "@/app/libs/quill.css";
 import SessionProviderWrapper from "@/providers/session.provider";
 
 const geistSans = localFont({
@@ -33,6 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>{/* <link rel="stylesheet" href="/src/lib/quill.css" /> */}</head>
       {/* <SessionProvider session={session}> */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
