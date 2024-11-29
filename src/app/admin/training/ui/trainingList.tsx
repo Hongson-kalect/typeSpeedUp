@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { TrainingType } from "../_utils/interface";
 import {
   Accordion,
   AccordionContent,
@@ -9,69 +7,24 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accodition";
 import { PiPlus, PiPlusCircle } from "react-icons/pi";
-import { useTrainingStore } from "../_utils/store";
+import { TrainingType } from "../_utils/interface";
+import { useAdminTrainingStore } from "../_utils/store";
 
 export interface ITrainingListProps {
   trainings?: TrainingType[];
 }
 
-const exList = [
-  {
-    title: "first session",
-    id: 1,
-    children: [
-      {
-        title: "first item child",
-        id: 2,
-      },
-      {
-        title: "second item child",
-        id: 3,
-      },
-      {
-        title: "third item child",
-        id: 4,
-      },
-    ],
-  },
-  {
-    title: "second session",
-    id: 5,
-    children: [
-      {
-        title: "first item child 2",
-        id: 6,
-      },
-      {
-        title: "second item child 2",
-        id: 7,
-        children: [
-          {
-            title: "first item child 2",
-            id: 8,
-          },
-          {
-            title: "second item child 2",
-            id: 9,
-          },
-          {
-            title: "third item child 2",
-            id: 10,
-          },
-        ],
-      },
-      {
-        title: "third item child 2",
-        id: 11,
-      },
-    ],
-  },
-];
-
 export default function TrainingList(props: ITrainingListProps) {
-  const { selectedTraining, setSelectedTraining } = useTrainingStore();
+  const { selectedTraining, setSelectedTraining, setIsAdd } =
+    useAdminTrainingStore();
+
+  const handleAddTraining = (item?: TrainingType) => {
+    setIsAdd(true);
+    setSelectedTraining(item);
+  };
+
   const renderItem = (item: TrainingType, navIndex: number = 0) => {
-    const selected = selectedTraining?.id === item.id;
+    const selected = selectedTraining?.id === item?.id;
     // let navIndex = 0;
 
     // if (item.children?.length > 0) {
@@ -80,6 +33,7 @@ export default function TrainingList(props: ITrainingListProps) {
         <div
           onClick={(e) => {
             e.stopPropagation();
+            setIsAdd(false);
             setSelectedTraining(item);
           }}
           className={`px-2 flex justify-between items-center cursor-pointer ${
@@ -91,8 +45,16 @@ export default function TrainingList(props: ITrainingListProps) {
           } ${selected ? "bg-blue-200 " : ""}`}
         >
           <p>{item.title}</p>
-
-          <PiPlusCircle className="opacity-80" />
+          <div
+            className="hover:opacity-100 duration-200 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAdd(true);
+              setSelectedTraining(item);
+            }}
+          >
+            <PiPlusCircle className="opacity-70" />
+          </div>
         </div>
       );
     }
@@ -102,6 +64,7 @@ export default function TrainingList(props: ITrainingListProps) {
         <AccordionTrigger
           onClick={(e) => {
             e.stopPropagation();
+            setIsAdd(false);
             setSelectedTraining(item);
           }}
           className={`px-2 ${
@@ -128,6 +91,7 @@ export default function TrainingList(props: ITrainingListProps) {
             );
           })}
           <div
+            onClick={() => handleAddTraining(item)}
             className={`py-1 hover:opacity-100 duration-200 cursor-pointer italic pl-2 flex gap-2 items-center opacity-80 ${
               navIndex === 0
                 ? " text-orange-600 hover:bg-orange-100 text-sm"
@@ -137,49 +101,33 @@ export default function TrainingList(props: ITrainingListProps) {
             }`}
           >
             <PiPlus />
-            <p>Add session</p>
+            <p>Add menu</p>
           </div>
         </AccordionContent>
       </AccordionItem>
     );
   };
 
-  // return (
-  //   <Accordion type="multiple" collapsible className="w-full">
-  //     <AccordionItem value="item-1">
-  //       <AccordionTrigger>Is it accessible?</AccordionTrigger>
-  //       <AccordionContent>
-  //         Yes. It adheres to the WAI-ARIA design pattern.
-  //       </AccordionContent>
-  //     </AccordionItem>
-  //     <AccordionItem value="item-2">
-  //       <AccordionTrigger>Is it styled?</AccordionTrigger>
-  //       <AccordionContent>
-  //         Yes. It comes with default styles that matches the other
-  //         components&apos; aesthetic.
-  //       </AccordionContent>
-  //     </AccordionItem>
-  //     <AccordionItem value="item-3">
-  //       <AccordionTrigger>Is it animated?</AccordionTrigger>
-  //       <AccordionContent>
-  //         Yes. It's animated by default, but you can disable it if you prefer.
-  //       </AccordionContent>
-  //     </AccordionItem>
-  //   </Accordion>
-  // );
-
   return (
     <Accordion
       type="multiple"
-      collapsible
+      // collapsible={true}
       className="w-1/3 bg-white px-4 py-3 rounded-lg h-full overflow-auto"
     >
       <h2 className="text-center border-b text-xl pb-2 mb-3">Training menu</h2>
-      {exList.map((item, index) => (
-        <div key={index}>{renderItem(item, 0)}</div>
-      ))}
+      {!props.trainings ? (
+        <div>Loading...</div>
+      ) : (
+        props.trainings?.map((item, index) => {
+          if (item?.parentId) return;
+          return <div key={index}>{renderItem(item, 0)}</div>;
+        })
+      )}
 
-      <div className="text-blue-800 font-bold text-lg py-4 flex gap-2 items-center italic opacity-60 cursor-pointer hover:opacity-100 duration-200">
+      <div
+        onClick={() => handleAddTraining()}
+        className="text-blue-800 font-bold text-lg py-4 flex gap-2 items-center italic opacity-60 cursor-pointer hover:opacity-100 duration-200"
+      >
         <PiPlus />
         <p>Add session</p>
       </div>

@@ -174,9 +174,9 @@ model Training {
   isDeleted Boolean @default(false)
   id Int @id @default(autoincrement())
   title String
-  qill String?
-  index String
   content String?
+  qill Json?
+  index String?
   parentId  Int?     // Đây là khóa ngoại tham chiếu đến chính bảng Item
   parent    Training?    @relation("ItemToItem", fields: [parentId], references: [id])
   children  Training[]   @relation("ItemToItem")

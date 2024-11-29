@@ -8,7 +8,7 @@ type IStrainingStore = {
   setIsAdd: (isAdd: boolean) => void;
 };
 
-export const useAdminTrainingStore = create<IStrainingStore>((set) => ({
+export const useTrainingStore = create<IStrainingStore>((set) => ({
   selectedTraining: undefined,
   setSelectedTraining: (training) =>
     set((state) => {

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { render } from "react-dom";
+"use client";
+
+import { useIsMounted } from "@/hooks/useIsMounted";
+import React from "react";
 import ReactQuill from "react-quill";
 
 interface QuillProps {
@@ -42,19 +44,17 @@ function Editor({ value, onChange }: QuillProps) {
   const handleProcedureContentChange = (content, delta, source, editor) => {
     onChange(content);
   };
+  const isMounted = useIsMounted();
 
-  return (
-    <>
-      {console.log(value)}
-      <ReactQuill
-        theme="snow"
-        modules={modules}
-        formats={formats}
-        value={value}
-        onChange={handleProcedureContentChange}
-      />
-    </>
-  );
+  return isMounted() ? (
+    <ReactQuill
+      theme="snow"
+      modules={modules}
+      formats={formats}
+      value={value}
+      onChange={handleProcedureContentChange}
+    />
+  ) : null;
 }
 
 export default Editor;

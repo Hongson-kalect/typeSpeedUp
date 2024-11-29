@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   const items = await prisma.training.findMany({
     where: { isDeleted: false },
+    // include: { children: true },
   });
   return NextResponse.json(items);
 }
