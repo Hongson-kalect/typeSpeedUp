@@ -172,15 +172,6 @@ export default function TypingArea({
   }, [isTyping]);
   React.useEffect(() => {
     setPrevDebounce(wordDebounce);
-
-    // if (isTyping) {
-    //   if (isNextWord) return setIsNextWord(false);
-    //   if (prevDebounce.length > wordDebounce.length) {
-    //     setFailCount(failCount + (prevDebounce.length - wordDebounce.length));
-    //   } else if (prevDebounce.length < wordDebounce.length) {
-    //     setTypedCharCount(typedCharCount + 1);
-    //   }
-    // }
   }, [wordDebounce]);
 
   React.useEffect(() => {

@@ -1,5 +1,5 @@
+import { TrainingType } from "@/app/admin/training/_utils/interface";
 import { create } from "zustand";
-import { TrainingType } from "./interface";
 
 type IStrainingStore = {
   selectedTraining?: TrainingType;

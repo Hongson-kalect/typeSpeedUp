@@ -26,7 +26,6 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
         <div
           onClick={(e) => {
             e.stopPropagation();
-            setIsAdd(false);
             setSelectedTraining(item);
           }}
           className={`px-2 !py-2  cursor-pointer ${
@@ -47,7 +46,6 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
         <AccordionTrigger
           onClick={(e) => {
             e.stopPropagation();
-            setIsAdd(false);
             setSelectedTraining(item);
           }}
           className={`px-2 py-2 ${
@@ -62,7 +60,6 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
         </AccordionTrigger>
         <AccordionContent className="px-2">
           {item.children?.map((item, index) => {
-            // navIndex++;
             return (
               <div
                 className=""
@@ -83,7 +80,7 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
       <div className="text-xl font-light">Training Menu</div>
 
       <Accordion type="multiple" className="mt-3">
-        {props.menuList.map((item, index) => {
+        {props.menuList.map((item) => {
           return renderItem(item);
         })}
       </Accordion>

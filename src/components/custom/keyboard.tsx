@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 
-const Keyboard = () => {
+const Keyboard = ({ char }: { char: string | null | undefined }) => {
   const keys = [
     [
       "`",
@@ -38,28 +38,57 @@ const Keyboard = () => {
     ["Ctrl", "Win", "Alt", "Space", "Alt", "Fn", "Menu", "Ctrl"],
   ];
 
+  console.log("char :>> ", char);
+
+  const uppercase = useMemo(() => {
+    return typeof char === "string" && char?.toUpperCase() === char;
+  }, [char]);
+
   return (
     <div className="flex flex-col items-center space-y-2">
       {keys.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex space-x-1">
-          {row.map((key) => (
-            <div
-              key={key}
-              className={`w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded shadow cursor-pointer select-none font-sans text-lg ${
-                key === "Backspace" ||
-                key === "Enter" ||
-                key === "Shift" ||
-                key === "CapsLock" ||
-                key === "Space"
-                  ? "w-20"
-                  : ""
-              }`}
-            >
-              {key}
-            </div>
-          ))}
+        <div key={rowIndex} className="flex space-x-0.5">
+          {row.map((key) => {
+            let isBold = false;
+            if (char?.toUpperCase() === key) {
+              isBold = true;
+            } else if (char === null && key === "Backspace") {
+              isBold = true;
+            } else if (char === undefined && key === "Space") {
+              isBold = true;
+            } else if (uppercase && key === "Shift") {
+              isBold = true;
+            }
+
+            return (
+              <div
+                key={key}
+                className={`duration-200 w-6 h-6 text-sm flex items-center justify-center bg-white border border-gray-300 rounded shadow cursor-pointer select-none font-sans ${
+                  key === "Backspace" ||
+                  key === "Tab" ||
+                  key === "Enter" ||
+                  key === "CapsLock"
+                    ? "!text-[10px] !w-12"
+                    : key === "Shift"
+                    ? "!text-[10px] !w-14"
+                    : ["Ctrl", "Win", "Alt", "Fn", "Menu"].includes(key)
+                    ? "!text-[10px] !w-8"
+                    : key === "Space"
+                    ? "!text-[10px] !w-32"
+                    : ""
+                } ${
+                  isBold
+                    ? "font-bold -translate-y-0.5 !bg-blue-600 text-white scale-105"
+                    : ""
+                }`}
+              >
+                {key}
+              </div>
+            );
+          })}
         </div>
       ))}
+      {char + "qq"}
     </div>
   );
 };
