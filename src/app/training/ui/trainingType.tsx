@@ -14,6 +14,14 @@ export interface ITrainingTypeProps {
   content: string;
 }
 
+export type KeyResultType = {
+  char: string;
+  total: number;
+  accuracy: number;
+};
+
+let timeInterval: NodeJS.Timeout;
+
 export default function TrainingType(props: ITrainingTypeProps) {
   const [typingChar, setTypingChar] = React.useState<string | null | undefined>(
     ""
@@ -62,6 +70,7 @@ const TypeArea = (props: TypeAreaProps) => {
   const [isNextWord, setIsNextWord] = React.useState(false);
 
   const [wordIndex, setWordIndex] = React.useState(0);
+  const [time, setTime] = React.useState(0);
 
   const [userInput, setUserInput] = React.useState("");
   const [userInputArr, setUserInputArr] = React.useState<string[]>([]);
@@ -81,6 +90,8 @@ const TypeArea = (props: TypeAreaProps) => {
     correctChar: 0,
     correctWord: 0,
   });
+
+  const [keyResult, setKeyResult] = React.useState<KeyResultType[]>([]);
 
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
@@ -103,6 +114,8 @@ const TypeArea = (props: TypeAreaProps) => {
     setIsTyping(false);
     setTypingVal("");
     setIsShowResult(false);
+    setTime(0);
+    if (timeInterval) clearInterval(timeInterval);
     setResult({
       wpm: 0,
       time: 0,
@@ -123,7 +136,52 @@ const TypeArea = (props: TypeAreaProps) => {
 
   const caculScore = () => {
     alert("Show result ");
+
+    const tempResult: KeyResultType[] = [];
+    paraArr.forEach((word, index) => {
+      for (let i = 0; i < word.length; i++) {
+        let charResult = tempResult.find((item) => item.char === word[i]);
+
+        if (!charResult) {
+          charResult = { char: word[i], total: 0, accuracy: 0 };
+          tempResult.push(charResult);
+          // setKeyResult((prev) => [...prev, charResult]);
+        }
+
+        charResult.total += 1;
+        if (userInputArr[index][i] === word[i]) {
+          charResult.accuracy += 1;
+        }
+        console.log(
+          "charResult :>> ",
+          word[i],
+          userInputArr[index][i],
+          charResult,
+          tempResult
+        );
+      }
+
+      if (userInputArr[index] === word) {
+        setResult((prev) => ({
+          ...prev,
+          correctChar: prev?.correctChar + word.length,
+          correctWord: prev?.correctWord + 1,
+        }));
+      } else {
+        setResult((prev) => ({
+          ...prev,
+          failChar: prev?.failChar + word.length,
+          failWord: prev?.failWord + 1,
+        }));
+      }
+    });
+
+    setKeyResult(tempResult.sort((a, b) => b.total - a.total));
   };
+
+  React.useEffect(() => {
+    console.log("keyResult :>> ", keyResult);
+  }, [keyResult]);
 
   React.useEffect(() => {
     if (isNextWord) {
@@ -147,23 +205,32 @@ const TypeArea = (props: TypeAreaProps) => {
     scrollTo("#char-" + wordIndex, ".words-wrapper");
     if (wordIndex >= paraArr.length) {
       caculScore();
+      setIsTyping(false);
       setIsShowResult(true);
+      clearInterval(timeInterval);
       inputRef.current?.setAttribute("disabled", "disabled");
     }
   }, [wordIndex]);
 
   React.useEffect(() => {
-    if (typingVal === paraArr[wordIndex].slice(0, typingVal.length)) {
+    if (typingVal === paraArr[wordIndex]?.slice(0, typingVal.length)) {
       const nextChar = paraArr[wordIndex][typingVal.length];
-      console.log("nextChar :>> ", nextChar);
       if (nextChar) props.setTypingChar(nextChar);
-      else props.setTypingChar("");
+      else props.setTypingChar(undefined);
     } else {
       props.setTypingChar(null);
     }
 
     console.log("typingVal.length :>> ", typingVal.length, typingVal);
-  }, [typingVal]);
+  }, [typingVal, wordIndex]);
+
+  React.useEffect(() => {
+    if (isTyping) {
+      timeInterval = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+    }
+  }, [isTyping]);
 
   return (
     <div className="typing mt-1 bg-white rounded-lg w-full flex-1 p-4 flex flex-col h-full">

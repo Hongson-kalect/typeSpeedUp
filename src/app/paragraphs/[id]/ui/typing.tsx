@@ -186,12 +186,6 @@ export default function TypingArea({
     }
   }, [wordIndex]);
 
-  // React.useEffect(() => {
-  //   if (isShowResult) {
-  //     setIsShowResult(true);
-  //   }
-  // }, [isShowResult]);
-
   React.useEffect(() => {
     inputRef.current?.focus();
   }, []);

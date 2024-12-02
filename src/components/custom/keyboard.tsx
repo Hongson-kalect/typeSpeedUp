@@ -38,17 +38,17 @@ const Keyboard = ({ char }: { char: string | null | undefined }) => {
     ["Ctrl", "Win", "Alt", "Space", "Alt", "Fn", "Menu", "Ctrl"],
   ];
 
-  console.log("char :>> ", char);
+  console.log("char :>> ", char?.toString());
 
   const uppercase = useMemo(() => {
-    return typeof char === "string" && char?.toUpperCase() === char;
+    return char && typeof char === "string" && char?.toUpperCase() === char;
   }, [char]);
 
   return (
     <div className="flex flex-col items-center space-y-2">
       {keys.map((row, rowIndex) => (
         <div key={rowIndex} className="flex space-x-0.5">
-          {row.map((key) => {
+          {row.map((key, index) => {
             let isBold = false;
             if (char?.toUpperCase() === key) {
               isBold = true;
@@ -62,7 +62,7 @@ const Keyboard = ({ char }: { char: string | null | undefined }) => {
 
             return (
               <div
-                key={key}
+                key={index}
                 className={`duration-200 w-6 h-6 text-sm flex items-center justify-center bg-white border border-gray-300 rounded shadow cursor-pointer select-none font-sans ${
                   key === "Backspace" ||
                   key === "Tab" ||
