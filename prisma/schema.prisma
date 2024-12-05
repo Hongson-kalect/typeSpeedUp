@@ -141,6 +141,7 @@ model Paragraph {
   updatedAt  DateTime  @updatedAt
   like Like[]
   favorite Favorite[]
+  historys      History[]
 }
 
 model Profile {
@@ -159,16 +160,19 @@ model Profile {
   updatedAt   DateTime @updatedAt
 }
 
-// model History {
-//   isDeleted Boolean @default(false)
-//   id Int @id @default(autoincrement())
-//   userId       Int
-//   user         AppUser  @relation(fields: [userId], references: [id])
-//   paragraphId       Int
-//   paragraph         Paragraph  @relation(fields: [paragraphId], references: [id])
-//   trainingId       Int
-//   training         Training  @relation(fields: [trainingId], references: [id])
-// }
+model History {
+  isDeleted Boolean @default(false)
+  id Int @id @default(autoincrement())
+  userId       Int
+  user         AppUser  @relation(fields: [userId], references: [id])
+  paragraphId       Int?
+  paragraph         Paragraph?  @relation(fields: [paragraphId], references: [id])
+  trainingId       Int?
+  training         Training?  @relation(fields: [trainingId], references: [id])
+  time DateTime[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
 
 model Training {
   isDeleted Boolean @default(false)
@@ -180,7 +184,8 @@ model Training {
   parentId  Int?     // Đây là khóa ngoại tham chiếu đến chính bảng Item
   parent    Training?    @relation("ItemToItem", fields: [parentId], references: [id])
   children  Training[]   @relation("ItemToItem")
-    createdAt    DateTime @default(now())
+  historys      History[]
+  createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
@@ -359,6 +364,7 @@ model AppUser {
   languageId    Int?      @unique
   language      Language? @relation(fields: [languageId], references: [id])
   devices       Device[]
+  historys      History[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

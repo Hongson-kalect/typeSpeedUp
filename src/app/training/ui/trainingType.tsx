@@ -6,9 +6,13 @@ import Keyboard from "@/components/custom/keyboard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useMainStore } from "@/layouts/main.store";
 import { formatString } from "@/lib/utils";
 import { ResetIcon } from "@radix-ui/react-icons";
+import axios from "axios";
 import * as React from "react";
+import { useTrainingStore } from "../_utils/store";
+import { calculateKeyResults, calculateScore } from "../_utils/util";
 
 export interface ITrainingTypeProps {
   content: string;
@@ -27,7 +31,20 @@ export default function TrainingType(props: ITrainingTypeProps) {
     ""
   );
 
-  console.log("typingChar :>> ", typingChar);
+  const [result, setResult] = React.useState<ResultType>({
+    wpm: 0,
+    time: 0,
+    cpm: 0,
+    wAccuracy: 0,
+    cAccuracy: 0,
+    score: 0,
+    failChar: 0,
+    failWord: 0,
+    correctChar: 0,
+    correctWord: 0,
+  });
+  const [keyResult, setKeyResult] = React.useState<KeyResultType[]>([]);
+  const [typed, setTyped] = React.useState<string>("");
 
   return (
     <div>
@@ -35,16 +52,18 @@ export default function TrainingType(props: ITrainingTypeProps) {
       <p>{props.content}</p>
       <div className="flex gap-2 w-full">
         <div className="bg-white flex-[2] p-2 shadow rounded-lg">
-          <TypeArea setTypingChar={setTypingChar} />
+          <TypeArea
+            setTypingChar={setTypingChar}
+            setResult={setResult}
+            setKeyResult={setKeyResult}
+            setTyped={setTyped}
+          />
         </div>
         <Keyboard char={typingChar} />
         {/* <KeyboardGuide typingChar={typingChar} /> */}
       </div>
       <div className="flex gap-2 mt-4 w-full">
-        <div className="bg-white flex flex-1 shadow rounded-lg p-2">
-          <div>Result</div>
-          <div>Score</div>
-        </div>
+        <ResultArea result={result} keyResult={keyResult} typed={typed} />
         <div className="bg-white flex-1 shadow rounded-lg p-2">Type detail</div>
       </div>
     </div>
@@ -55,15 +74,20 @@ type TypeAreaProps = {
   setTypingChar: React.Dispatch<
     React.SetStateAction<string | null | undefined>
   >;
+  setResult: React.Dispatch<React.SetStateAction<ResultType>>;
+  setKeyResult: React.Dispatch<React.SetStateAction<KeyResultType[]>>;
+  setTyped: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const TypeArea = (props: TypeAreaProps) => {
   const [content] = React.useState(
     "aSdA sddd aasa sdsa sdasd lkjl kjj jjkj lklk jhh klkjl"
   );
+  const { userInfo } = useMainStore();
   const paraArr = React.useMemo(() => {
     return formatString(content).split(" ");
   }, []);
+  const { selectedTraining } = useTrainingStore();
 
   const [isShowResult, setIsShowResult] = React.useState(false);
   const [isTyping, setIsTyping] = React.useState(false);
@@ -78,27 +102,13 @@ const TypeArea = (props: TypeAreaProps) => {
   const wordDebounce = useDebounce(typingVal, 0);
   const [prevWordDebounce, setPrevWordDebounce] = React.useState("");
 
-  const [result, setResult] = React.useState<ResultType>({
-    wpm: 0,
-    time: 0,
-    cpm: 0,
-    wAccuracy: 0,
-    cAccuracy: 0,
-    score: 0,
-    failChar: 0,
-    failWord: 0,
-    correctChar: 0,
-    correctWord: 0,
-  });
-
-  const [keyResult, setKeyResult] = React.useState<KeyResultType[]>([]);
-
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!isTyping) setIsTyping(true);
 
     const value = e.target.value;
+    console.log("value :>> ", value);
     if (value.slice(-1) === " " || value.slice(-1) === "\n") {
       setIsNextWord(true);
       userInputArr.push(value.slice(0, value.length - 1));
@@ -116,7 +126,7 @@ const TypeArea = (props: TypeAreaProps) => {
     setIsShowResult(false);
     setTime(0);
     if (timeInterval) clearInterval(timeInterval);
-    setResult({
+    props.setResult({
       wpm: 0,
       time: 0,
       cpm: 0,
@@ -134,64 +144,36 @@ const TypeArea = (props: TypeAreaProps) => {
     inputRef.current?.focus();
   };
 
-  const caculScore = () => {
-    alert("Show result ");
+  console.log("props.setKeyResult :>> ", props.setKeyResult);
 
-    const tempResult: KeyResultType[] = [];
-    paraArr.forEach((word, index) => {
-      for (let i = 0; i < word.length; i++) {
-        let charResult = tempResult.find((item) => item.char === word[i]);
-
-        if (!charResult) {
-          charResult = { char: word[i], total: 0, accuracy: 0 };
-          tempResult.push(charResult);
-          // setKeyResult((prev) => [...prev, charResult]);
-        }
-
-        charResult.total += 1;
-        if (userInputArr[index][i] === word[i]) {
-          charResult.accuracy += 1;
-        }
-        console.log(
-          "charResult :>> ",
-          word[i],
-          userInputArr[index][i],
-          charResult,
-          tempResult
-        );
-      }
-
-      if (userInputArr[index] === word) {
-        setResult((prev) => ({
-          ...prev,
-          correctChar: prev?.correctChar + word.length,
-          correctWord: prev?.correctWord + 1,
-        }));
-      } else {
-        setResult((prev) => ({
-          ...prev,
-          failChar: prev?.failChar + word.length,
-          failWord: prev?.failWord + 1,
-        }));
-      }
+  const caculScore = async () => {
+    await calculateScore({
+      content,
+      paraArr,
+      userInputArr,
+      time,
+      setResult: props.setResult,
+      setTyped: props.setTyped,
+      userId: userInfo?.id,
+      selectedTrainingId: selectedTraining?.id,
     });
 
-    setKeyResult(tempResult.sort((a, b) => b.total - a.total));
+    calculateKeyResults({
+      paraArr,
+      userInputArr,
+      setKeyResult: "clmm",
+    });
   };
-
-  React.useEffect(() => {
-    console.log("keyResult :>> ", keyResult);
-  }, [keyResult]);
 
   React.useEffect(() => {
     if (isNextWord) {
       setIsNextWord(false);
-      setTypingVal("");
+      // setTypingVal("");
       setPrevWordDebounce("");
       return;
     }
     if (prevWordDebounce.length > wordDebounce.length) {
-      setResult((prev) => ({
+      props.setResult((prev) => ({
         ...prev,
         failChar:
           (prev?.failChar || 0) +
@@ -199,6 +181,9 @@ const TypeArea = (props: TypeAreaProps) => {
       }));
     }
     setPrevWordDebounce(wordDebounce);
+
+    userInputArr[wordIndex] = wordDebounce;
+    setUserInputArr([...userInputArr]);
   }, [wordDebounce]);
 
   React.useEffect(() => {
@@ -220,8 +205,6 @@ const TypeArea = (props: TypeAreaProps) => {
     } else {
       props.setTypingChar(null);
     }
-
-    console.log("typingVal.length :>> ", typingVal.length, typingVal);
   }, [typingVal, wordIndex]);
 
   React.useEffect(() => {
@@ -326,102 +309,20 @@ const TypeArea = (props: TypeAreaProps) => {
   );
 };
 
-const KeyboardGuide = ({ char }: { char: string | null | undefined }) => {
-  const [capsLock, setCapsLock] = React.useState(false);
-  const [shift, setShift] = React.useState(false);
-
-  const keys = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-    "Q",
-    "W",
-    "E",
-    "R",
-    "T",
-    "Y",
-    "U",
-    "I",
-    "O",
-    "P",
-    "A",
-    "S",
-    "D",
-    "F",
-    "G",
-    "H",
-    "J",
-    "K",
-    "L",
-    "Z",
-    "X",
-    "C",
-    "V",
-    "B",
-    "N",
-    "M",
-    "Space",
-    "Delete",
-    "Shift",
-    "Caps Lock",
-  ];
-
-  const handleKeyClick = (key: string) => {
-    if (key === "Caps Lock") {
-      setCapsLock(!capsLock);
-    } else if (key === "Shift") {
-      setShift(!shift);
-    }
-  };
-
+const ResultArea = ({
+  typed,
+  result,
+  keyResult,
+}: {
+  typed: string;
+  result: ResultType;
+  keyResult: KeyResultType[];
+}) => {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(10, 1fr)",
-        gap: "10px",
-      }}
-    >
-      {keys.map((key) => {
-        let displayKey = key;
-        let isBold = false;
-
-        if (char === key) {
-          isBold = true;
-        } else if (char === null && key === "Delete") {
-          isBold = true;
-        } else if (char === undefined && key === "Space") {
-          isBold = true;
-        }
-
-        if (capsLock || shift) {
-          if (key.length === 1 && /[a-zA-Z]/.test(key)) {
-            displayKey = key.toUpperCase();
-          }
-        }
-
-        return (
-          <div
-            key={key}
-            onClick={() => handleKeyClick(key)}
-            style={{
-              padding: "10px",
-              border: "1px solid black",
-              fontWeight: isBold ? "bold" : "normal",
-              cursor: "pointer",
-            }}
-          >
-            {displayKey}
-          </div>
-        );
-      })}
+    <div className="bg-white flex-1 shadow rounded-lg p-2">
+      <div>{JSON.stringify(result)}</div>
+      <div>{JSON.stringify(keyResult)}</div>
+      <div>{JSON.stringify(typed)}</div>
     </div>
   );
 };
