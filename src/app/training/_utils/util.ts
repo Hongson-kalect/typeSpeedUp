@@ -64,11 +64,11 @@ export const calculateScore = async ({
 
   setTyped(userInputArr.join(" "));
 
-  const keyResults = calculateKeyResults({ paraArr, userInputArr });
-  setResult((prev) => ({
-    ...prev,
-    ...keyResults,
-  }));
+  //   const keyResults = calculateKeyResults({ paraArr, userInputArr });
+  //   setResult((prev) => ({
+  //     ...prev,
+  //     ...keyResults,
+  //   }));
 
   if (userId && selectedTrainingId) {
     await postHistory(userId, selectedTrainingId);
@@ -82,19 +82,14 @@ export const calculateKeyResults = ({
 }: {
   paraArr: string[];
   userInputArr: string[];
-  setKeyResult: string;
-}): {
-  correctChar: number;
-  correctWord: number;
-  failChar: number;
-  failWord: number;
-} => {
+  setKeyResult: React.Dispatch<React.SetStateAction<KeyResultType[]>>;
+}) => {
   let correctChar = 0,
     correctWord = 0,
     failChar = 0,
     failWord = 0;
 
-  console.log("setKeyResult :>> ", paraArr, "setKeyResult");
+  console.log("setKeyResult :>> ", paraArr, userInputArr);
 
   const tempResult: KeyResultType[] = [];
 
@@ -110,7 +105,7 @@ export const calculateKeyResults = ({
 
       keyIndex.total += 1;
       if (userInputArr[index][charIndex] === char) {
-        correctChar += 1;
+        keyIndex.accuracy += 1;
       }
     });
     if (userInputArr[index] === word) {
