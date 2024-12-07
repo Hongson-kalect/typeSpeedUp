@@ -128,7 +128,7 @@ export default function NovelInfo({ novel }: INovelInfoProps) {
             </p>
           )}
         </div>
-        <h3 className="mt-8 font-medium text-lg underline">Có thể bạn thích</h3>
+        <h4 className="mt-8 font-medium text-lg underline">Có thể bạn thích</h4>
         <div className="py-2 flex-1 overflow-auto shadow-inner shadow-gray-200 ">
           <div className="h-full overflow-auto">
             <div className="flex gap-y-6 flex-wrap px-4 py-3">

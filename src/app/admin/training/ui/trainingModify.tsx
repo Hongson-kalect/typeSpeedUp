@@ -37,12 +37,17 @@ export default function TrainingModify(props: ITrainingModifyProps) {
       if (res.data) {
         setIsAdd(false);
         setSelectedTraining(res.data);
+        toast.success("Add training success");
       }
     } else {
       if (!selectedTraining) return toast.error("Chưa chọn training");
       const { id, children, ...rest } = modifyTraining;
       const res = await axios.put("/api/training/" + selectedTraining.id, rest);
-      if (res.data) setSelectedTraining(res.data);
+      if (res.data){
+
+        setSelectedTraining(res.data);
+        toast.success("Edit training success");
+      }
     }
     props.query.refetch();
   };
@@ -77,7 +82,7 @@ export default function TrainingModify(props: ITrainingModifyProps) {
     );
 
   return (
-    <div className="flex-1 bg-white px-4 py-3 rounded-lg">
+    <div className="flex-1 bg-white px-4 py-3 rounded-lg overflow-auto">
       <h2 className="text-center border-b text-xl pb-2 mb-3">
         {isAdd ? "Add training" : "Edit training"}
       </h2>

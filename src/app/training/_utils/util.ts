@@ -99,16 +99,16 @@ export const calculateKeyResults = ({
       //detect tempResult have that key yet
       let keyIndex = tempResult.find((key) => key.char === char);
       if (!keyIndex) {
-        keyIndex = { char, total: 1, accuracy: 0 };
+        keyIndex = { char, total: 0, accuracy: 0 };
         tempResult.push(keyIndex);
       }
 
       keyIndex.total += 1;
-      if (userInputArr[index][charIndex] === char) {
+      if (userInputArr?.[index]?.[charIndex] === char) {
         keyIndex.accuracy += 1;
       }
     });
-    if (userInputArr[index] === word) {
+    if (userInputArr?.[index] === word) {
       correctChar += word.length;
       correctWord += 1;
     } else {
@@ -117,7 +117,11 @@ export const calculateKeyResults = ({
     }
   });
 
-  setKeyResult(tempResult);
+  setKeyResult(
+    tempResult
+      .sort((a, b) => a.char.localeCompare(b.char))
+      .sort((a, b) => b.total - a.total)
+  );
 
   return {
     correctChar,

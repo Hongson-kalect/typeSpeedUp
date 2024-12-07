@@ -22,7 +22,6 @@ export default NextAuth({
 
   callbacks: {
     async session({ session, user }) {
-      console.log("session  cb q:>> ", session);
       // Add custom user data to the session object
       session.user.id = user.id;
       session.user.name = user.name;

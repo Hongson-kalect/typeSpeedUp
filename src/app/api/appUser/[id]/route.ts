@@ -24,11 +24,6 @@ export async function PUT(
   const requestBody = await request.json();
 
   const { id, _id, ...editContent } = requestBody;
-  // const editedItem = await prisma.novel.update({
-  //   where: { id: reqId },
-  //   data: editContent,
-  // });
-  console.log("editContent :>> ", editContent);
 
   const editedItem = await prisma.appUser.update({
     where: { id: Number(reqId) },

@@ -45,7 +45,6 @@ export async function GET(
   novel.likes = novel._count.like;
   novel.favorites = novel._count.favorite;
 
-  console.log("novel :>> ", novel);
 
   // const matchedItems = novelRaw?.cursor?.firstBatch[0];
   // const novel = EJSON.deserialize({

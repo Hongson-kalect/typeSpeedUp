@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import "./react-quill.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider, getSession } from "next-auth/react";
 import ReactQueryProvider from "@/providers/reactQuery.provider";

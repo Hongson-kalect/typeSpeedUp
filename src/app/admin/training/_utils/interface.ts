@@ -1,7 +1,7 @@
 export type TrainingType = {
   isDeleted?: boolean;
   id?: number;
-  title?: string;
+  title: string;
   qill?: string;
   index?: string;
   content?: string;

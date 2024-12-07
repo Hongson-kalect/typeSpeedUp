@@ -7,6 +7,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accodition";
+import { useSearchParams } from "next/navigation";
+import { useSearch } from "@/hooks/useSearch";
+import useAppParams from "@/hooks/useAppParam";
 
 export interface ITrainingMenuProps {
   menuList: TrainingType[];
@@ -15,6 +18,37 @@ export interface ITrainingMenuProps {
 export default function TrainingMenu(props: ITrainingMenuProps) {
   const { selectedTraining, setSelectedTraining, setIsAdd, isAdd } =
     useTrainingStore();
+  // const searchParams = useSearchParams();
+  // const trainingId = searchParams.get("trainingId");
+
+  // const createQueryString = React.useCallback(
+  //   (name: string, value: string) => {
+  //     const params = new URLSearchParams(searchParams.toString());
+  //     params.set(name, value);
+
+  //     return params.toString();
+  //   },
+  //   [searchParams]
+  // );
+  const params = useAppParams();
+
+  // Get the 'id' parameter
+  const id = params("id");
+  const trainingId = params("trainingId");
+  console.log("Current ID:", id);
+  console.log("Current Training ID:", trainingId);
+
+  React.useEffect(() => {
+    if (trainingId && props.menuList) {
+      const training = props.menuList.find(
+        (item) => item.id === Number(trainingId)
+      );
+      if (training) {
+        setSelectedTraining(training);
+      }
+      setSelectedTraining(training);
+    }
+  }, [trainingId, props.menuList]);
 
   const renderItem = (item: TrainingType, navIndex: number = 0) => {
     const selected = selectedTraining?.id === item?.id;
@@ -26,6 +60,7 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
         <div
           onClick={(e) => {
             e.stopPropagation();
+            params("trainingId", item?.id?.toString());
             setSelectedTraining(item);
           }}
           className={`px-2 !py-2  cursor-pointer ${
@@ -46,6 +81,7 @@ export default function TrainingMenu(props: ITrainingMenuProps) {
         <AccordionTrigger
           onClick={(e) => {
             e.stopPropagation();
+            params("trainingId", item?.id?.toString());
             setSelectedTraining(item);
           }}
           className={`px-2 py-2 ${

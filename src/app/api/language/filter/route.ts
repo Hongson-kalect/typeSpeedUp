@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const requestBody = await request.json();
-  console.log("request :>> ", requestBody);
 
   const matchedItems = await prisma.language.findMany({
     where: requestBody,

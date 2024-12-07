@@ -20,8 +20,6 @@ export async function POST(request: Request) {
     where: { id: Number(requestBody.targetId) },
   });
 
-  console.log("para :>> ", para);
-
   if (!para) {
     return NextResponse.json(
       { message: "Paragraph not found" },
@@ -68,7 +66,6 @@ export async function POST(request: Request) {
       where: { targetId: para.id, isDeleted: false, rank: "average" },
     });
 
-    console.log("averageScore :>> ", averageScore);
     if (averageScore) {
       const completedTime = para.completed;
       averageScore.cpm =
@@ -121,7 +118,6 @@ export async function POST(request: Request) {
         },
       });
 
-      console.log("completedTime :>> ", completedTime);
       await prisma.paragraph.update({
         where: { id: para.id },
         data: {

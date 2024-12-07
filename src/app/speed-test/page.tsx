@@ -1,33 +1,14 @@
 "use client";
-import * as React from "react";
-import { scrollTo, scrollToId } from "../libs/utils";
+import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
-import { wordRate, words } from "./utils/const";
-import { CiEdit, CiSettings } from "react-icons/ci";
+import * as React from "react";
+import { CiEdit } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { RiTimerLine } from "react-icons/ri";
-import { Button } from "@/components/ui/button";
-
-export interface ISpeedTestProps {}
-
-const Timer = ({ time }) => {
-  const formatTime = (t) =>
-    `${
-      Math.floor(t / 3600)
-        ? Math.floor(t / 3600)
-            .toString()
-            .padStart(2, "0") + ":"
-        : ""
-    }${Math.floor((t % 3600) / 60)
-      .toString()
-      .padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
-  return (
-    <div className="flex items-center gap-2">
-      <p id="time">{formatTime(time)}</p>
-    </div>
-  );
-};
+import { scrollTo, scrollToId } from "../libs/utils";
+import { wordRate, words } from "./utils/const";
+import { Timer } from "@/components/timer";
 
 const Paragraphs = ({
   paragraphsArray,
@@ -466,8 +447,6 @@ const SpeedTest = (props: ISpeedTestProps) => {
 
       if (selectedWordType) wordType = selectedWordType[0];
 
-      console.log("wordType :>> ", wordType);
-
       const wordLib = words.vi?.[wordType] || [];
 
       const wordIndex = Math.floor(Math.random() * wordLib.length);
@@ -630,7 +609,7 @@ const SpeedTest = (props: ISpeedTestProps) => {
               onClick={resetType}
             >
               <GrPowerReset size={20} />
-              <p>reset</p>
+              <p>Reset</p>
 
               <p className="absolute text-xs -bottom-4 w-full left-0 text-center text-gray-400">
                 <span>( F5 )</span>

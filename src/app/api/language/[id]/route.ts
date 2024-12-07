@@ -22,7 +22,6 @@ export async function PUT(
 
   const requestBody = await request.json();
   const { ...updateInfo } = requestBody;
-  console.log("request :>> ", requestBody);
 
   const editedItem = await prisma.language.update({
     where: { id },

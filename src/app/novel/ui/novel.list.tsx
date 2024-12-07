@@ -198,7 +198,7 @@ const NovelItem = (props: NovelInfoType & { favor?: boolean }) => {
       </td>
       <td className="text-green-500 font-medium">
         <div>
-          <h3 className="line-clamp-1 text-gray-800 font-bold">{props.name}</h3>
+          <p className="line-clamp-1 text-gray-800 font-bold">{props.name}</p>
         </div>
       </td>
       <td>

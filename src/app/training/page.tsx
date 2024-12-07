@@ -22,21 +22,25 @@ export default function DefaultPage() {
     const menuLists = JSON.parse(JSON.stringify(trainingQuery.data));
     const data: TrainingType[] = [];
 
-    menuLists.map((item: TrainingType) => {
-      if (item?.parentId) {
-        const parent = menuLists.find(
-          (parent: TrainingType) => item.parentId === parent.id
-        );
-        if (parent) {
-          if (!parent?.children) parent.children = [];
+    menuLists
+      .sort((a: TrainingType, b: TrainingType) =>
+        a?.title?.localeCompare(b?.title)
+      )
+      .map((item: TrainingType) => {
+        if (item?.parentId) {
+          const parent = menuLists.find(
+            (parent: TrainingType) => item.parentId === parent.id
+          );
+          if (parent) {
+            if (!parent?.children) parent.children = [];
 
-          parent.children.push(item);
+            parent.children.push(item);
+          }
+        } else {
+          data.push(item);
         }
-      } else {
-        data.push(item);
-      }
-    });
-    return data;
+      });
+    return data.sort((a, b) => a?.title?.localeCompare(b?.title));
   }, [trainingQuery.data]);
 
   console.log("menuList :>> ", menuList);

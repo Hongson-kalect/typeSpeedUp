@@ -9,8 +9,6 @@ export async function POST(request: Request) {
   // Get request body
   const requestBody = await request.json();
 
-  console.log("requestBody :>> ", requestBody);
-
   if (requestBody.userId) {
     console.log("search novel by userId");
   }
@@ -57,8 +55,6 @@ export async function POST(request: Request) {
     like: novel._count.like,
     favorite: novel._count.favorite,
   }));
-
-  console.log("novelsWithCounts :>> ", novelsWithCounts);
 
   return NextResponse.json(novelsWithCounts);
 }

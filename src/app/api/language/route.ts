@@ -15,7 +15,6 @@ export async function GET() {
 export async function POST(request: Request) {
   const requestBody = await request.json();
   const { code, name, desc, flag } = requestBody;
-  console.log("request :>> ", requestBody);
 
   const newItem = await prisma.language.create({
     data: {
@@ -30,10 +29,8 @@ export async function POST(request: Request) {
 
 export async function PUT(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id");
-  console.log("id :>> ", id);
   const requestBody = await request.json();
   const { ...updateInfo } = requestBody;
-  console.log("request :>> ", requestBody);
 
   if (!id || !ObjectId.isValid(id))
     return NextResponse.json(

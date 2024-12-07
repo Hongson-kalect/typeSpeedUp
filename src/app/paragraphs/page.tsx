@@ -243,9 +243,7 @@ const ParaItem = (props: IParagraphItem) => {
               <p>{props.novel.name}</p>
             </div>
           )}
-          <h3 className="line-clamp-1 text-gray-800 font-bold">
-            {props.header}
-          </h3>
+          <p className="line-clamp-1 text-gray-800 font-bold">{props.header}</p>
           <p className="text-gray-600 text-sm line-clamp-1">{props.content}</p>
         </div>
       </td>
