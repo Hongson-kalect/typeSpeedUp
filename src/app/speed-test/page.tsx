@@ -1,64 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useDebounce } from "@/hooks/useDebounce";
 import * as React from "react";
-import { CiEdit } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
-import { IoSettingsOutline } from "react-icons/io5";
-import { RiTimerLine } from "react-icons/ri";
-import { scrollTo, scrollToId } from "../libs/utils";
-import { wordRate, words } from "./utils/const";
-import { Timer } from "@/components/timer";
-
-const Paragraphs = ({
-  paragraphsArray,
-  userInputArray,
-  wordIndex,
-  typingWord,
-}) => (
-  <div className="paragraphs px-2 flex flex-wrap rounded-xl line-clamp-3 mb-4 w-5/6 bg-blue-200 py-2 h-24 overflow-hidden">
-    {paragraphsArray.map((item, index) => (
-      <div
-        id={"char-" + index}
-        className={`px-1.5 text-2xl h-10  rounded-lg ${
-          wordIndex === index ? "bg-yellow-300 text-white" : ""
-        } ${
-          userInputArray[index] !== undefined
-            ? userInputArray[index] !== item
-              ? "text-red-400"
-              : "text-green-600"
-            : ""
-        }`}
-        style={{ lineHeight: "40px" }}
-        key={index}
-      >
-        {index === wordIndex ? (
-          <div className="relative">
-            {item.split("").map((char, charIndex) => (
-              <span
-                className={`${
-                  typingWord?.[charIndex] === undefined
-                    ? "text-black"
-                    : typingWord?.[charIndex] !== char
-                    ? "text-red-500"
-                    : "text-green-600"
-                }`}
-                key={charIndex}
-              >
-                {char}
-              </span>
-            ))}
-            <p className="absolute left-0 -bottom-10 bg-black text-white">
-              {typingWord}
-            </p>
-          </div>
-        ) : (
-          item
-        )}
-      </div>
-    ))}
-  </div>
-);
+import { scrollTo } from "../libs/utils";
+import TypeArea from "./components/TypeArea";
+import { IResult } from "./types";
 
 const Result = ({ result, reset }) => (
   <div
@@ -284,29 +230,16 @@ const RankItem = (props: IRankItemProps) => {
 
 const SpeedTest = (props: ISpeedTestProps) => {
   const [paragraphs, setParagraphs] = React.useState("");
-  const paragraphsArray = React.useMemo(() => {
-    return paragraphs.split(/[ \n]+/);
-  }, [paragraphs]);
   const [userInput, setUserInput] = React.useState("");
-  const userInputArray = React.useMemo(() => {
-    return userInput.split(" ");
-  }, [userInput]);
-  const [typedCharCount, setTypedCharCount] = React.useState(0);
   const [wordIndex, setWordIndex] = React.useState(0);
-  const [typingWord, setTypingWord] = React.useState("");
-  const [typingChar, setTypingChar] = React.useState("");
-  const wordDebounce = useDebounce(typingWord, 0);
-  const [prevDebounce, setPrevDebounce] = React.useState("");
-  const [failCount, setFailCount] = React.useState(0);
-  const [initTime, setInitTime] = React.useState(60);
-  const [time, setTime] = React.useState(initTime);
-  const [isNextWord, setIsNextWord] = React.useState(false);
   const [isTyping, setIsTyping] = React.useState(false);
   const [isShowScore, setIsShowScore] = React.useState(false);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
-  const [result, setResult] = React.useState({
+  const [result, setResult] = React.useState<IResult>({
     wordTyped: 0,
     charTyped: 0,
+    wordCorrect: 0,
+    charCorrect: 0,
     wordError: 0,
     charError: 0,
     wpm: 0,
@@ -320,14 +253,10 @@ const SpeedTest = (props: ISpeedTestProps) => {
   const resetType = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     inputRef.current?.removeAttribute("disabled");
-    setTypedCharCount(0);
     setParagraphs("");
     setUserInput("");
-    setTime(initTime);
     setWordIndex(0);
-    setFailCount(0);
     setIsTyping(false);
-    setTypingWord("");
     inputRef.current?.focus();
 
     window.scrollTo({
@@ -341,168 +270,11 @@ const SpeedTest = (props: ISpeedTestProps) => {
     });
   };
 
-  const startTyping = () => {
-    setIsTyping(true);
-    intervalRef.current = setInterval(() => {
-      setTime((prev) => {
-        if (!prev) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          return 0;
-        } else {
-          return prev - 1;
-        }
-      });
-    }, 1000);
-  };
-
-  const onType = (value: string) => {
-    if (!isTyping) startTyping();
-
-    setTypingWord(value);
-
-    if (value.slice(-1) === " " || value.slice(-1) === "\n") {
-      if (prevDebounce !== paragraphsArray[wordIndex]) {
-        console.log(
-          "asdasdasdasdasd",
-          prevDebounce,
-          paragraphsArray[wordIndex]
-        );
-        setFailCount(failCount + prevDebounce.length);
-      }
-      setUserInput((prev) => prev + value.slice(0, value.length - 1) + " ");
-      setWordIndex(wordIndex + 1);
-      setIsNextWord(true);
-    }
-  };
-
-  const caculScore = () => {
-    const charFail = wordIndex ? failCount : 0;
-    let wordFail = 0;
-
-    console.log("charFail", charFail);
-
-    const typedWordArray = paragraphsArray.slice(0, wordIndex);
-    const typedWord = typedWordArray.join("");
-    typedWordArray.map((word, index) => {
-      if (word !== userInputArray[index]) {
-        wordFail += 1;
-      }
-    });
-
-    const wordTyped = typedWordArray.length;
-    const charTyped = wordIndex ? typedCharCount : 0;
-
-    const wpm = Math.floor(wordTyped / (initTime / 60));
-    const cpm = Math.floor((charTyped / initTime) * 60);
-    const wa = wordTyped
-      ? Math.floor(((wordTyped - wordFail) / wordTyped) * 10000) / 100
-      : 0;
-    const ca = charTyped
-      ? Math.floor(((charTyped - charFail) / charTyped) * 10000) / 100
-      : 0;
-    const score =
-      Math.floor(
-        Math.sqrt((typedWord.length * charTyped * wa * ca) / (initTime || 1))
-      ) / 10;
-    setResult({
-      wordTyped,
-      charTyped,
-      wordError: wordFail,
-      charError: charFail,
-      wpm,
-      cpm,
-      wa,
-      ca,
-      score,
-    });
-  };
-
-  const finishType = () => {
-    caculScore();
-    setIsTyping(false);
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    inputRef.current?.setAttribute("disabled", "disabled");
-
-    setIsShowScore(true);
-    scrollToId("type-result");
-  };
-
-  const getWord = () => {
-    const type = "basic"; //basic normal extreme master
-    //type này sẽ lấy từ settings
-
-    let addWord = "";
-    while (addWord.split(" ").length < 10) {
-      const gacha = Math.floor(Math.random() * 100);
-      let wordType = "";
-      const selectedWordType = Object.entries(wordRate[type]).find(
-        ([key, value]) => {
-          return value >= gacha;
-        }
-      );
-
-      if (selectedWordType) wordType = selectedWordType[0];
-
-      const wordLib = words.vi?.[wordType] || [];
-
-      const wordIndex = Math.floor(Math.random() * wordLib.length);
-
-      if (wordType === "baseSpe" || wordType === "advanceSpe")
-        addWord += wordLib[wordIndex];
-      else {
-        addWord += " " + wordLib[wordIndex];
-      }
-      console.log(
-        "wordType, wordLib[wordIndex] :>> ",
-        wordType,
-        wordLib[wordIndex]
-      );
-    }
-
-    return addWord.trim();
-  };
-
   React.useEffect(() => {
-    if (isTyping && !time) {
-      finishType();
-    }
-  }, [time, isTyping]);
-
-  React.useEffect(() => {
-    if (paragraphsArray.length <= wordIndex + 50) {
-      const addText = getWord();
-      setParagraphs((prev) => {
-        if (prev) return prev + " " + addText;
-        else return addText;
-      });
-    }
-  }, [paragraphsArray, wordIndex]);
-
-  React.useEffect(() => {
-    setPrevDebounce(wordDebounce);
-
-    if (isTyping) {
-      if (isNextWord) return setIsNextWord(false);
-      if (prevDebounce.length > wordDebounce.length) {
-        setFailCount(failCount + (prevDebounce.length - wordDebounce.length));
-      } else if (prevDebounce.length < wordDebounce.length) {
-        setTypedCharCount(typedCharCount + 1);
-      }
-    }
-  }, [wordDebounce]);
-
-  React.useEffect(() => {
-    setTypingWord("");
     scrollTo("#char-" + wordIndex, ".words-wrapper");
   }, [wordIndex]);
 
   React.useEffect(() => {
-    // resetType();
-    inputRef.current?.focus();
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -512,115 +284,20 @@ const SpeedTest = (props: ISpeedTestProps) => {
 
   return (
     <div className=" p-4 flex-1 px-6 overflow-auto" id="speed-test-page">
-      <div
-        className="bg-white px-6 py-5 rounded-lg mt-4 flex gap-4"
-        style={{ border: "2px solid #D8D8D8" }}
-      >
-        <div className="w-2/3">
-          <div className="flex items-end justify-between">
-            <div className="flex gap-2 items-center">
-              <p className="text-gray-600">Tiếng Việt</p>
-              <CiEdit size={18} />
-            </div>
-            <div className="setting flex items-end gap-1">
-              <IoSettingsOutline size={20} className="text-gray-500 mb-1" />
-              <p className="h-7 rounded-lg mb-0.5 bg-green-500 text-white px-3 flex items-center justify-center">
-                Dễ
-              </p>
-              <RiTimerLine size={20} className="text-gray-500 ml-2 mb-1" />
-              <Timer time={time} />
-            </div>
-          </div>
-          <div
-            className="relative bg-[#F5F6FA] px-4 py-3 rounded-lg shadow-sm shadow-gray-300 "
-            style={{ border: "1px solid #d8d8d8" }}
-          >
-            <div className="h-[120px] overflow-y-hidden   words-wrapper">
-              <div
-                className="text-2xl flex flex-wrap overflow-auto "
-                style={{ wordSpacing: "8px" }}
-              >
-                <div id="first-word"></div>
-                {paragraphsArray.map((item, index) => (
-                  <div
-                    id={"char-" + index}
-                    className={`px-1.5 text-2xl h-9 pb-1 inline rounded-lg ${
-                      wordIndex === index ? "bg-yellow-300 text-white" : ""
-                    } ${
-                      userInputArray[index] !== undefined
-                        ? userInputArray[index] !== item
-                          ? "text-red-400"
-                          : "text-green-600"
-                        : ""
-                    }`}
-                    // style={{ lineHeight: "40px" }}
-                    key={index}
-                  >
-                    {index === wordIndex ? (
-                      <p className="relative inline">
-                        {item.split("").map((char, charIndex) => (
-                          <span
-                            className={` ${
-                              typingWord?.[charIndex] === undefined
-                                ? "text-black"
-                                : typingWord?.[charIndex] !== char
-                                ? "text-red-500"
-                                : "text-green-600"
-                            }`}
-                            key={charIndex}
-                          >
-                            {char}
-                          </span>
-                        ))}
-                        {isTyping ? (
-                          <div className=" px-4 mx-auto rounded-xl absolute z-10 text-2xl  top-8 -left-4 bg-black box-content  min-w-full box text-white">
-                            <p className="h-6">
-                              {typingWord}
-                              <span className="text-gray-400">_</span>
-                            </p>
-                            <p className="mt-2 text-center text-gray-500 text-xs">
-                              <span>combo</span>
-                              <span className="text-gray-300">x2</span>
-                            </p>
-                          </div>
-                        ) : null}
-                      </p>
-                    ) : (
-                      item
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="absolute top-12 left-1 right-1 h-[90px] bg-[#f6faffaa]"></div>
-          </div>
-          <div className="flex gap-8 items-center mt-6">
-            <textarea
-              ref={inputRef}
-              spellCheck={false}
-              value={typingWord}
-              onChange={(e) => onType(e.target.value)}
-              className="disabled:bg-gray-200 disabled:text-gray-400 disabled:!border-none  text-center font-bold outline-none rounded-xl resize-none h-12 text-[#0C3690] !border-[#0C3690] flex items-center justify-center text-xl"
-              rows={1}
-              style={{ border: "2px solid #0C3690", lineHeight: "44px" }}
-            />
-            <button
-              className="text-white flex h-12 rounded-lg bg-green-500 items-center px-4 gap-3 relative"
-              onClick={resetType}
-            >
-              <GrPowerReset size={20} />
-              <p>Reset</p>
-
-              <p className="absolute text-xs -bottom-4 w-full left-0 text-center text-gray-400">
-                <span>( F5 )</span>
-              </p>
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 px-4" style={{ borderLeft: "1px solid #ddd" }}>
-          <p>Bên lưu ghi mấy cái streak, animation, combo các thứ</p>
-        </div>
-      </div>
+      <TypeArea
+        paragraphs={paragraphs}
+        userInput={userInput}
+        wordIndex={wordIndex}
+        setParagraphs={setParagraphs}
+        setUserInput={setUserInput}
+        setWordIndex={setWordIndex}
+        isTyping={isTyping}
+        setIsTyping={setIsTyping}
+        resetType={resetType}
+        setResult={setResult}
+        isFinish={isShowScore}
+        setIsFinish={setIsShowScore}
+      />
 
       <div className="h-20 flex items-center justify-center mt-8">
         <div className="h-full w-40 bg-red-300"></div>

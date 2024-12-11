@@ -192,7 +192,7 @@ export const words = {
     ],
     normal: [
       "thư",
-      "giáo",
+      "gi��o",
       "pháp",
       "kế",
       "nghĩa",
@@ -481,3 +481,7 @@ export const wordRate = {
     freeUppercase: 33,
   },
 };
+
+export const rankList = [
+  // ... existing rank list data ...
+];

@@ -1,9 +1,17 @@
-// Tạo hook để lấy search params từ url sử dụng Object.fromEntries
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 
-import { useSearchParams } from "next/navigation";
+export function useSearch() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramsObject = useMemo(() => {
+    const params: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+    return params;
+  }, [searchParams]);
 
-export const useSearch = () => {
-  const [params, setSearchParams] = useSearchParams();
-  const searchParams = Object.fromEntries(params.entries());
-  return { searchParams, setSearchParams };
-};
+  console.log("paramsObject", paramsObject);
+
+  return { paramsObject, setSearchParams };
+}
