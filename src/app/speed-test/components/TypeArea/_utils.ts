@@ -1,3 +1,4 @@
+import axios from "axios";
 import { IResult } from "../../types";
 import { wordRate, words } from "../../utils/const";
 
@@ -61,12 +62,12 @@ export const caculScore = ({
   initResult.charError = wordIndex ? failCount : 0;
 
   const correctWords = paragraphsArray.slice(0, wordIndex);
-  userInputArray.pop();
+  userInputArray.pop(); //remove last space
   initResult.wordTyped = wordIndex;
   userInputArray.map((typedWord, index) => {
     const correctWord = correctWords[index];
     const isCorrect = typedWord === correctWord;
-    console.log("correctWord, typedWord :>> ", correctWord, typedWord);
+
     if (isCorrect) {
       initResult.wordCorrect += 1;
       initResult.charCorrect += correctWord.length;
@@ -84,8 +85,6 @@ export const caculScore = ({
         }
       }
     }
-    // initResult.wordTyped += 1;
-    // initResult.charTyped += typedWord.length;
   });
 
   initResult.wordTyped = userInputArray.length;
@@ -97,11 +96,7 @@ export const caculScore = ({
     ? Math.floor((initResult.wordCorrect / initResult.wordTyped) * 10000) / 100
     : 0;
   initResult.ca = initResult.charTyped
-    ? Math.floor(
-        ((initResult.charCorrect - initResult.charError) /
-          initResult.charTyped) *
-          10000
-      ) / 100
+    ? Math.floor((initResult.charCorrect / initResult.charTyped) * 10000) / 100
     : 0;
   initResult.score =
     Math.floor(
@@ -114,4 +109,22 @@ export const caculScore = ({
       )
     ) / 10;
   return initResult;
+};
+
+export const pushScore = async (
+  result: IResult,
+  userId: number,
+  languageId: number
+) => {
+  await axios.post("/api/score", {
+    type: "speed-test",
+    userId: userId,
+    languageId: languageId,
+    wpm: result.wpm,
+    cpm: result.cpm,
+    score: result.score,
+    wAccuracy: result.wa,
+    cAccuracy: result.ca,
+    time: result.time || 60,
+  });
 };

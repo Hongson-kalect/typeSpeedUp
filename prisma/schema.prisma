@@ -90,6 +90,7 @@ model Language {
   typeStyle           TypeStyle[]
   word                Word[]
   wordRate            WordRate[]
+  score               Score[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 }
@@ -236,8 +237,10 @@ model Score {
   userId    Int?
   user      AppUser? @relation(fields: [userId], references: [id])
   rank      String
+  languageId Int?
+  language   Language?  @relation(fields: [languageId], references: [id])
   type      String
-  targetId  Int
+  targetId  Int?
   wpm       Float
   cpm       Float
   score     Float

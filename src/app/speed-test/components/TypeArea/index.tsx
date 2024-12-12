@@ -2,12 +2,16 @@ import { scrollTo, scrollToId } from "@/app/libs/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import * as React from "react";
 import { GrPowerReset } from "react-icons/gr";
-import { caculScore, getWord } from "./_utils";
+import { caculScore, getWord, pushScore } from "./_utils";
 import { Header } from "./Header";
 import { WordList } from "./WordList";
-import { IResult } from "../../types";
+import { IRank, IResult } from "../../types";
+import { useSession } from "next-auth/react";
+import { useMainStore } from "@/layouts/main.store";
+import { UseQueryResult } from "@tanstack/react-query";
 
 export interface ITypeAreaProps {
+  rankQuery: UseQueryResult<IRank[]>;
   paragraphs: string;
   userInput: string;
   wordIndex: number;
@@ -23,6 +27,7 @@ export interface ITypeAreaProps {
 }
 
 export default function TypeArea({
+  rankQuery,
   isTyping,
   setIsTyping,
   paragraphs,
@@ -36,6 +41,9 @@ export default function TypeArea({
   isFinish,
   setIsFinish,
 }: ITypeAreaProps) {
+  const { userInfo, languages } = useMainStore();
+
+  // console.log("userInfo :>> ", userInfo);
   const paragraphsArray = React.useMemo(() => {
     return paragraphs.split(/[ \n]+/);
   }, [paragraphs]);
@@ -50,7 +58,9 @@ export default function TypeArea({
   const [time, setTime] = React.useState(initTime);
   const [isNextWord, setIsNextWord] = React.useState(false);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
-  const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const [inputRef, setInputRef] = React.useState<HTMLTextAreaElement | null>(
+    null
+  );
 
   const startTyping = () => {
     setIsTyping(true);
@@ -81,22 +91,32 @@ export default function TypeArea({
     }
   };
 
-  const finishType = () => {
+  const finishType = async () => {
+    inputRef?.setAttribute("disabled", "disabled");
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
 
     setIsTyping(false);
-    setResult(
-      caculScore({
-        failCount,
-        wordIndex,
-        paragraphsArray,
-        userInputArray,
-        initTime,
-      })
-    );
-    inputRef.current?.setAttribute("disabled", "disabled");
+    const result = caculScore({
+      failCount,
+      wordIndex,
+      paragraphsArray,
+      userInputArray,
+      initTime,
+    });
+    setResult(result);
+
+    //only push score when user is logged in change if need
+    if (userInfo?.id && Number(userInfo?.id) && userInfo?.language?.id) {
+      await pushScore(
+        result,
+        Number(userInfo.id),
+        Number(userInfo.language?.id)
+      );
+      await rankQuery.refetch();
+    }
     setIsFinish(true);
     scrollToId("type-result");
   };
@@ -105,7 +125,17 @@ export default function TypeArea({
     if (isTyping && !time) {
       finishType();
     }
-  }, [time, isTyping]);
+  }, [time]);
+
+  React.useEffect(() => {
+    if (!isFinish) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      setTime(initTime);
+      setTypingWord("");
+    }
+  }, [isFinish]);
 
   React.useEffect(() => {
     if (paragraphsArray.length <= wordIndex + 30) {
@@ -135,40 +165,37 @@ export default function TypeArea({
   }, [wordIndex]);
 
   React.useEffect(() => {
-    // resetType();
-    inputRef.current?.focus();
+    setInputRef(document.querySelector("textarea") || null);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
   }, []);
+  React.useEffect(() => {
+    if (inputRef) {
+      inputRef.focus();
+    }
+  }, [inputRef]);
 
   return (
     <div
-      className="bg-white px-6 py-5 rounded-lg mt-4 flex gap-4"
-      style={{ border: "2px solid #D8D8D8" }}
+      className={`bg-white rounded-lg mt-4 flex gap-4 duration-500 overflow-hidden ${
+        isFinish ? "h-0 min-h-0" : "h-[300px]"
+      }`}
     >
-      <div className="w-2/3">
+      <div className={`w-2/3 px-6 py-5 shadow-sm shadow-gray-300`}>
         <Header time={time} />
         <div
           className="relative bg-[#F5F6FA] px-4 py-3 rounded-lg shadow-sm shadow-gray-300 "
           style={{ border: "1px solid #d8d8d8" }}
         >
-          <div className="h-[120px] overflow-y-hidden   words-wrapper">
+          <div className="h-[120px] overflow-y-hidden words-wrapper">
             <div
               className="text-2xl flex flex-wrap overflow-auto "
               style={{ wordSpacing: "8px" }}
             >
               <div id="first-word"></div>
-              {/* {
-                wordList({
-                    typedArray:userInputArray,
-                    typingWord:wordDebounce,
-                    wordIndex:wordIndex,
-                    words:paragraphsArray
-                })
-              } */}
               <WordList
                 typedArray={userInputArray}
                 typingWord={wordDebounce}
@@ -182,7 +209,6 @@ export default function TypeArea({
         <div className="flex gap-8 items-center mt-6">
           <textarea
             id="input-text"
-            ref={inputRef}
             spellCheck={false}
             value={typingWord}
             onChange={(e) => onType(e.target.value)}

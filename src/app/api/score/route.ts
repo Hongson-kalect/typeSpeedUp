@@ -16,6 +16,18 @@ export async function POST(request: Request) {
   // const newItem = await prisma.score.create({
   //   data: requestBody,
   // });
+  // add speed-test rank and return
+  if (requestBody.type === "speed-test") {
+    const rank = await prisma.score.create({
+      data: {
+        ...requestBody,
+      },
+    });
+
+    return NextResponse.json(rank);
+  }
+
+  //add paragraph rank and return best and average score
   const para = await prisma.paragraph.findFirst({
     where: { id: Number(requestBody.targetId) },
   });
