@@ -1,8 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import { IRank, IResult } from "../../types";
-import { getSpeedTestRank } from "./_utils";
-import { useEffect } from "react";
-import { useMainStore } from "@/layouts/main.store";
 
 type IRankItemProps = {
   result: IRank;
@@ -39,7 +35,7 @@ type IRankProps = {
 };
 
 export const Rank = ({ result, ranks }: IRankProps) => {
-  const { userInfo } = useMainStore();
+  // const { userInfo } = useMainStore();
 
   return (
     <div

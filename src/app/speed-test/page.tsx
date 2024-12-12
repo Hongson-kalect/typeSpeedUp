@@ -8,7 +8,7 @@ import { IRank, IResult } from "./types";
 import { useQuery } from "@tanstack/react-query";
 import { getSpeedTestRank } from "./components/Ranking/_utils";
 
-const SpeedTest = (props: ISpeedTestProps) => {
+const SpeedTest = () => {
   const [paragraphs, setParagraphs] = React.useState("");
   const [userInput, setUserInput] = React.useState("");
   const [wordIndex, setWordIndex] = React.useState(0);
