@@ -7,6 +7,7 @@ export async function GET() {
   const items = await prisma.paragraph.findMany({
     where: { isDeleted: false },
     include: { novel: true },
+    orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(items);
 }
