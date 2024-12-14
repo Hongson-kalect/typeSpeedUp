@@ -8,8 +8,8 @@ export interface IResult {
   charError: number;
   wpm: number;
   cpm: number;
-  wa: number;
-  ca: number;
+  wAccuracy: number;
+  cAccuracy: number;
   score: number | null;
 }
 
@@ -35,8 +35,8 @@ export interface IRankItemProps {
   rank: number;
   wpm: number;
   cpm: number;
-  wa: number;
-  ca: number;
+  wAccuracy: number;
+  cAccuracy: number;
   score: number;
   attempt: number;
 }

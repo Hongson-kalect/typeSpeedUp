@@ -236,7 +236,7 @@ model Score {
   id        Int      @id @default(autoincrement())
   userId    Int?
   user      AppUser? @relation(fields: [userId], references: [id])
-  rank      String
+  rank      String?
   languageId Int?
   language   Language?  @relation(fields: [languageId], references: [id])
   type      String

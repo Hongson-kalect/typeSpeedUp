@@ -31,102 +31,104 @@ export async function POST(request: Request) {
   const para = await prisma.paragraph.findFirst({
     where: { id: Number(requestBody.targetId) },
   });
+  
+    if (!para) {
+      return NextResponse.json(
+        { message: "Paragraph not found" },
+        { status: 404 }
+      );
+    }
 
-  if (!para) {
-    return NextResponse.json(
-      { message: "Paragraph not found" },
-      { status: 404 }
-    );
-  }
-
-  const bestScore = await prisma.score.findFirst({
-    where: { targetId: para.id, isDeleted: false, rank: "best" },
-  });
-
-  if (!bestScore) {
-    await prisma.score.create({
-      data: {
-        ...requestBody,
-        rank: "best",
-      },
+    const best = await prisma.score.findFirst({
+      where: { targetId: Number(para.id), isDeleted: false, rank: "best" },
+    });
+    const average = await prisma.score.findFirst({
+      where: { targetId: Number(para.id), isDeleted: false, rank: "average" },
     });
 
-    await prisma.score.create({
-      data: {
-        ...requestBody,
-        rank: "average",
-      },
-    });
+    if (!requestBody.score) {
+      return NextResponse.json({ best, average });
+    }
 
-    return NextResponse.json({
-      best: null,
-      average: null,
-    });
-  } else {
-    if (requestBody.score > bestScore.score) {
-      const { id, ...plug } = requestBody;
-      await prisma.score.update({
-        where: { id: bestScore.id },
+    if (!best) {
+      const best = await prisma.score.create({
         data: {
-          ...plug,
+          ...requestBody,
+          rank: "best",
+        },
+      });
+
+      const average = await prisma.score.create({
+        data: {
+          ...requestBody,
+          rank: "average",
+        },
+      });
+
+      return NextResponse.json({
+        best,
+        average,
+      });
+    }
+    if (requestBody.score > best.score) {
+      const { id, ...rest } = requestBody;
+      await prisma.score.update({
+        where: { id: best.id },
+        data: {
+          ...rest,
           rank: "best",
         },
       });
     }
 
-    const averageScore = await prisma.score.findFirst({
-      where: { targetId: para.id, isDeleted: false, rank: "average" },
-    });
-
-    if (averageScore) {
+    if (average) {
       const completedTime = para.completed;
-      averageScore.cpm =
+      average.cpm =
         Math.floor(
-          ((averageScore?.cpm * completedTime + requestBody.cpm) /
+          ((average?.cpm * completedTime + requestBody.cpm) /
             (completedTime + 1)) *
             10
         ) / 10;
-      averageScore.wpm =
+      average.wpm =
         Math.floor(
-          ((averageScore?.wpm * completedTime + requestBody.wpm) /
+          ((average?.wpm * completedTime + requestBody.wpm) /
             (completedTime + 1)) *
             10
         ) / 10;
-      averageScore.score =
+      average.score =
         Math.floor(
-          ((averageScore?.score * completedTime + requestBody.score) /
+          ((average?.score * completedTime + requestBody.score) /
             (completedTime + 1)) *
             10
         ) / 10;
-      averageScore.wAccuracy =
+      average.wAccuracy =
         Math.floor(
-          ((averageScore?.wAccuracy * completedTime + requestBody.wAccuracy) /
+          ((average?.wAccuracy * completedTime + requestBody.wAccuracy) /
             (completedTime + 1)) *
             10
         ) / 10;
-      averageScore.cAccuracy =
+      average.cAccuracy =
         Math.floor(
-          ((averageScore?.cAccuracy * completedTime + requestBody.cAccuracy) /
+          ((average?.cAccuracy * completedTime + requestBody.cAccuracy) /
             (completedTime + 1)) *
             10
         ) / 10;
-      averageScore.time =
+      average.time =
         Math.floor(
-          ((averageScore?.time * completedTime + requestBody.time) /
+          ((average?.time * completedTime + requestBody.time) /
             (completedTime + 1)) *
             10
         ) / 10;
 
-      const {} = averageScore;
       const reAverageScore = await prisma.score.update({
-        where: { id: averageScore.id },
+        where: { id: average.id },
         data: {
-          cpm: averageScore.cpm,
-          wpm: averageScore.wpm,
-          score: averageScore.score,
-          wAccuracy: averageScore.wAccuracy,
-          cAccuracy: averageScore.cAccuracy,
-          time: averageScore.time,
+          cpm: average.cpm,
+          wpm: average.wpm,
+          score: average.score,
+          wAccuracy: average.wAccuracy,
+          cAccuracy: average.cAccuracy,
+          time: average.time,
         },
       });
 
@@ -138,9 +140,8 @@ export async function POST(request: Request) {
       });
 
       return NextResponse.json({
-        best: bestScore,
+        best: best,
         average: reAverageScore,
       });
     }
-  }
 }

@@ -1,29 +1,56 @@
 "use client";
 
-import TypeArea from "@/app/speed-test/components/TypeArea";
-import { IResult } from "@/app/speed-test/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useMainStore } from "@/layouts/main.store";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { useParams } from "next/navigation";
 import * as React from "react";
-import { BiStar } from "react-icons/bi";
-import { FaFlag } from "react-icons/fa";
+import TypingArea from "./ui/typing";
+import NovelOptions from "./ui/options";
+import TypedScore from "./ui/score";
 import {
   NovelInfoType,
   ParaInfoType,
+  ResultType,
   ScoreInfoType,
 } from "../_utils/interface";
+import { MdReport } from "react-icons/md";
+import { Button } from "@/components/ui/button";
+import { FaFlag } from "react-icons/fa";
+import { BiStar } from "react-icons/bi";
+import { Input } from "@/components/ui/input";
 import SendButton from "../components/send.button";
-import NovelOptions from "./ui/options";
-import TypedScore from "./ui/score";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/compat/router";
+import axios from "axios";
+import { useParams } from "next/navigation";
+import { useMainStore } from "@/layouts/main.store";
 
-export default function ParaInfoPage() {
+export interface IParaInfoPageProps {}
+
+export default function ParaInfoPage(props: IParaInfoPageProps) {
+  const router = useRouter();
   const params = useParams();
 
   const { userInfo } = useMainStore();
+  const [reset, setReset] = React.useState<() => void>(() => {
+    return () => {};
+  });
+  const [isShowResult, setIsShowResult] = React.useState(false);
+  const [userTyped, setUserTyped] = React.useState("");
+  const [result, setResult] = React.useState<ResultType>({
+    time: 0,
+    wpm: 0,
+    cpm: 0,
+    wAccuracy: 0,
+    cAccuracy: 0,
+    score: 0,
+    failChar: 0,
+    failWord: 0,
+    correctChar: 0,
+    correctWord: 0,
+  });
+
+  const [rank, setRank] = React.useState({
+    best: {},
+    average: {},
+  });
 
   const paraInfo = useQuery<ParaInfoType>({
     queryFn: async () => {
@@ -42,35 +69,20 @@ export default function ParaInfoPage() {
     queryKey: ["novelInfo"],
   });
 
-  const [resetType, setResetType] = React.useState(false);
-  const [isShowScore, setIsShowScore] = React.useState(false);
-  const [result, setResult] = React.useState<IResult>({
-    wordTyped: 0,
-    charTyped: 0,
-    wordCorrect: 0,
-    charCorrect: 0,
-    wordError: 0,
-    charError: 0,
-    wpm: 0,
-    cpm: 0,
-    wAccuracy: 0,
-    cAccuracy: 0,
-    score: 0,
-  });
-
-  const ranking = useQuery<{
-    best: ScoreInfoType;
-    average: ScoreInfoType;
+  const ranking = useMutation<{
+    best?: ScoreInfoType;
+    average?: ScoreInfoType;
   }>({
-    queryFn: async () => {
-      if (!params.id) return { best: {}, average: {} };
+    mutationFn: async () => {
+      console.log("result :>> ", result);
+      if (!params.id || !isShowResult) return;
 
       const { wpm, cpm, wAccuracy, cAccuracy, score, time } = result;
       const res = await axios.post("/api/score/", {
         wpm,
         cpm,
-        wAccuracy: wAccuracy,
-        cAccuracy: cAccuracy,
+        wAccuracy,
+        cAccuracy,
         score,
         time,
         userId: userInfo?.id,
@@ -80,31 +92,55 @@ export default function ParaInfoPage() {
       });
       return res.data;
     },
-    queryKey: ["ranking"],
+    mutationKey: ["ranking"],
+    onSuccess: (data) => {
+      setRank(data);
+    },
   });
+
+  React.useEffect(() => {
+    console.log("isShowResult, params.id :>> ", isShowResult, params.id);
+    if (isShowResult && params.id) {
+      ranking.mutate();
+    }
+  }, [isShowResult]);
+
+  const resetResult = () => {
+    setResult({
+      wpm: 0,
+      cpm: 0,
+      wAccuracy: 0,
+      cAccuracy: 0,
+      score: 0,
+      failChar: 0,
+      failWord: 0,
+      correctChar: 0,
+      correctWord: 0,
+    });
+  };
 
   return (
     <div className="flex flex-1 overflow-auto w-full">
-      <div className="flex-1 px-6 py-4 overflow-auto hide-scroll">
+      <div className="flex-1 px-6 py-4 flex-col flex overflow-auto  hide-scroll">
         <h2 className="text-xl font-semibold text-gray-600">
           Chapter {paraInfo.data?.chapter}: {paraInfo.data?.header}
         </h2>
-        {/* <div className="typing pt-1 bg-white rounded-lg w-full"> */}
-        <TypeArea
-          timeType="countDown"
-          rankQuery={ranking}
-          isReset={resetType}
-          setIsReset={setResetType}
-          setResult={setResult}
-          isFinish={isShowScore}
-          setIsFinish={setIsShowScore}
-        />
-        {/* </div> */}
+        <div className="typing pt-1 bg-white rounded-lg w-full">
+          <TypingArea
+            language={paraInfo.data?.language.name}
+            para={paraInfo.data?.content}
+            setResult={setResult}
+            isShowResult={isShowResult}
+            setIsShowResult={setIsShowResult}
+            setUserTyped={setUserTyped}
+            setReset={setReset}
+          />
+        </div>
         <TypedScore
-          isShowResult={isShowScore}
+          isShowResult={isShowResult}
           result={result}
-          rank={ranking.data || { best: {}, average: {} }}
-          reset={() => setResetType(true)}
+          rank={rank}
+          reset={reset}
         />
         <div className="flex gap-4 mt-8">
           <div className="bg-white flex-1 px-4 py-3 rounded-lg">
@@ -141,10 +177,10 @@ export default function ParaInfoPage() {
           </div>
           <div
             className={`bg-white overflow-hidden w-1/2 px-4 rounded-lg duration-500 ${
-              !isShowScore ? "h-0" : "h-full"
+              !isShowResult ? "h-0" : "h-full"
             }`}
           >
-            {/* <div className="py-3">
+            <div className="py-3">
               <div>
                 <h2 className=" text-orange-500 font-bold text-lg">
                   YOUR PARAGRAPHS
@@ -153,9 +189,9 @@ export default function ParaInfoPage() {
               <div
                 className={`py-2 px-2 rounded bg-blue-50 overflow-hidden duration-500 relative `}
               >
-                {userInput}
+                {userTyped}
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

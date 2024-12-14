@@ -10,15 +10,15 @@ export async function GET(request: Request) {
   if (targetId && userId) {
     const report = await prisma.report.findFirst({
       where: {
-        targetId,
-        userId,
+        targetId: Number(targetId),
+        userId: Number(userId),
       },
     });
 
     return NextResponse.json(report);
   }
 
-  const items = await prisma.like.findMany({
+  const items = await prisma.report.findMany({
     where: { isDeleted: false },
   });
   return NextResponse.json(items);

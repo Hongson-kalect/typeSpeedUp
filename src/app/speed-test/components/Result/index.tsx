@@ -52,7 +52,7 @@ export const Result = ({
         />
 
         <ResultItem name="Số chữ / phút" result={result.wpm || 0} />
-        <ResultItem name="Tỉ lệ đúng" result={result.wa || 0} italic />
+        <ResultItem name="Tỉ lệ đúng" result={result.wAccuracy || 0} italic />
 
         <ResultItem
           name="Số ký tự đã gõ"
@@ -67,7 +67,7 @@ export const Result = ({
         />
 
         <ResultItem name="Số ký tự / phút" result={result.cpm || 0} />
-        <ResultItem name="Tỉ lệ đúng" result={result.ca || 0} italic />
+        <ResultItem name="Tỉ lệ đúng" result={result.cAccuracy || 0} italic />
       </div>
     </div>
     <div

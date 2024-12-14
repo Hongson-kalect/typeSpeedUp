@@ -14,9 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Timer } from "./typing";
+import { IResult } from "@/app/speed-test/types";
 
 export interface ITypedScoreProps {
-  result: ResultType;
+  result: IResult;
   isShowResult: boolean;
   reset: () => void;
   rank: {
@@ -25,18 +26,6 @@ export interface ITypedScoreProps {
   };
 }
 
-// const result = {
-//   wordTyped: 210,
-//   wordError: 63,
-//   wpm: 60.8,
-//   wa: 60.8,
-//   charTyped: 60.8,
-//   charError: 60.8,
-//   cpm: 60.8,
-//   ca: 60.8,
-//   score: 60.8,
-// };
-
 export default function TypedScore({
   result,
   isShowResult,
@@ -44,9 +33,9 @@ export default function TypedScore({
   reset,
 }: ITypedScoreProps) {
   const ranks = React.useMemo(() => {
-    if (rank.best && rank.average)
+    if (rank.best?.rank && rank.average?.rank)
       return [rank.best, rank.average, result].sort(
-        (a, b) => b.score - a.score
+        (a, b) => (b.score || 0) - (a.score || 0)
       );
     else return [result];
   }, [rank, result]);
@@ -96,9 +85,9 @@ export default function TypedScore({
             <div className="">
               <p className="text-sm text-gray-600 mt-3">Số chữ</p>
               <p className="font-semibold text-xl mt-2 text-center">
-                <span>{result.correctWord || 0}</span>
+                <span>{result.wordCorrect || 0}</span>
                 <span className="text-sm text-red-400">
-                  ({result.failWord || 0})
+                  ({result.wordError || 0})
                 </span>
               </p>
             </div>
@@ -113,16 +102,16 @@ export default function TypedScore({
               <p className=" mt-2 text-center text-xl text-green-600 italic">
                 {result.wAccuracy || 0}%{" "}
                 {/* <span className="text-xs text-red-400">
-                  {100 - result.wa || 0}%
+                  {100 - result.wAccuracy || 0}%
                 </span> */}
               </p>
             </div>
             <div className="">
               <p className="text-sm text-gray-600 mt-3">Số ký tự</p>
               <p className="font-semibold text-xl mt-2 text-center">
-                <span>{result.correctChar || 0}</span>
+                <span>{result.charCorrect || 0}</span>
                 <span className="text-sm text-red-400">
-                  ({result.failChar || 0})
+                  ({result.charError || 0})
                 </span>
               </p>
             </div>
@@ -137,7 +126,7 @@ export default function TypedScore({
               <p className=" mt-2 text-center text-xl text-green-600 italic">
                 {result.cAccuracy || 0}%{" "}
                 {/* <span className="text-xs text-red-400">
-                  {100 - result.wa || 0}%
+                  {100 - result.wAccuracy || 0}%
                 </span> */}
               </p>
             </div>
@@ -168,13 +157,13 @@ export default function TypedScore({
         <div className="px-3">
           <Table>
             <TableCaption>
-              {!rank.best?.score || result.score > rank.best?.score ? (
+              {!rank.best?.score || result?.score || 0 > rank.best?.score ? (
                 <p>Congratulation, you just create a new record</p>
               ) : (
                 <p>
                   You better than{" "}
                   <span className="text-lg font-medium text-blue-800">
-                    {calculatePercentage(result.score)}%
+                    {calculatePercentage(result?.score || 0)}%
                   </span>{" "}
                   of people.
                 </p>

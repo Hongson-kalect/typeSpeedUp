@@ -10,13 +10,13 @@ export async function GET(request: Request) {
   if (targetId && userId) {
     const favorite = await prisma.favorite.findFirst({
       where: {
-        targetId,
-        userId,
+        targetId: Number(targetId),
+        userId: Number(userId),
       },
     });
 
     const favoriteCount = await prisma.favorite.count({
-      where: { targetId, isDeleted: false },
+      where: { targetId: Number(targetId), isDeleted: false },
     });
 
     return NextResponse.json({ favorite, favoriteCount });

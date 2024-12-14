@@ -17,9 +17,10 @@ import {
 import { PiPlus } from "react-icons/pi";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useParagraphStore } from "../../_utils/store";
 
 export const Header = () => {
-  const [date, setDate] = React.useState(new Date());
+  const { filter, setFilter } = useParagraphStore();
   return (
     <div
       id="para-header"
@@ -46,16 +47,16 @@ export const Header = () => {
               variant={"outline"}
               className={cn(
                 "w-[120px] justify-start text-left text-xs",
-                !date && "text-muted-foreground"
+                !filter.date && "text-muted-foreground"
               )}
             >
               {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
-              {date ? (
-                date.getFullYear() +
+              {filter.date ? (
+                filter.date.getFullYear() +
                 "-" +
-                date.getMonth().toString().padStart(2, "0") +
+                filter.date.getMonth().toString().padStart(2, "0") +
                 "-" +
-                date.getDate()
+                filter.date.getDate()
               ) : (
                 <span>Pick a date</span>
               )}
@@ -64,8 +65,8 @@ export const Header = () => {
           <PopoverContent className="w-auto p-0">
             <Calendar
               mode="single"
-              selected={date}
-              onSelect={(date) => date && setDate(date)}
+              selected={filter.date}
+              onSelect={(date) => date && setFilter({ ...filter, date })}
               initialFocus
             />
           </PopoverContent>

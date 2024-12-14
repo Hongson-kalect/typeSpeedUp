@@ -54,8 +54,8 @@ export const caculScore = ({
     charError: 0,
     wpm: 0,
     cpm: 0,
-    wa: 0,
-    ca: 0,
+    wAccuracy: 0,
+    cAccuracy: 0,
     score: 0,
   };
 
@@ -92,10 +92,10 @@ export const caculScore = ({
 
   initResult.wpm = Math.floor(initResult.wordCorrect / (initTime / 60));
   initResult.cpm = Math.floor((initResult.charCorrect / initTime) * 60);
-  initResult.wa = initResult.wordTyped
+  initResult.wAccuracy = initResult.wordTyped
     ? Math.floor((initResult.wordCorrect / initResult.wordTyped) * 10000) / 100
     : 0;
-  initResult.ca = initResult.charTyped
+  initResult.cAccuracy = initResult.charTyped
     ? Math.floor((initResult.charCorrect / initResult.charTyped) * 10000) / 100
     : 0;
   initResult.score =
@@ -103,8 +103,8 @@ export const caculScore = ({
       Math.sqrt(
         (initResult.wordCorrect *
           initResult.charCorrect *
-          initResult.wa *
-          initResult.ca) /
+          initResult.wAccuracy *
+          initResult.cAccuracy) /
           (initTime || 1)
       )
     ) / 10;
@@ -123,8 +123,8 @@ export const pushScore = async (
     wpm: result.wpm,
     cpm: result.cpm,
     score: result.score,
-    wAccuracy: result.wa,
-    cAccuracy: result.ca,
+    wAccuracy: result.wAccuracy,
+    cAccuracy: result.cAccuracy,
     time: result.time || 60,
   });
 };

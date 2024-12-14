@@ -10,13 +10,13 @@ export async function GET(request: Request) {
   if (targetId && userId) {
     const like = await prisma.like.findFirst({
       where: {
-        targetId,
-        userId,
+        targetId: Number(targetId),
+        userId: Number(userId),
       },
     });
 
     const likeCount = await prisma.like.count({
-      where: { targetId, isDeleted: false },
+      where: { targetId: Number(targetId), isDeleted: false },
     });
 
     return NextResponse.json({ like, likeCount });

@@ -14,8 +14,8 @@ export const calculateScore = (
     charError,
     wpm,
     cpm,
-    wa,
-    ca,
+    wAccuracy,
+    cAccuracy,
     score,
   };
 };

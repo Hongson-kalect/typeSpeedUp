@@ -70,8 +70,12 @@ export const Rank = ({ result, ranks }: IRankProps) => {
               </td>
               <td className="text-blue-600 font-medium">{result.wpm}</td>
               <td>{result.cpm}</td>
-              <td className="text-sm text-green-500 italic">{result.wa}%</td>
-              <td className="text-sm text-green-500 italic">{result.ca}%</td>
+              <td className="text-sm text-green-500 italic">
+                {result.wAccuracy}%
+              </td>
+              <td className="text-sm text-green-500 italic">
+                {result.cAccuracy}%
+              </td>
               <td className="text-lg font-bold">{result.score}</td>
               {/* <td>5</td> */}
             </tr>

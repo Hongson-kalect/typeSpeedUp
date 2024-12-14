@@ -235,9 +235,9 @@ export interface IScore {
   wps: number;
   cps: number;
   score: number;
-  wa: number;
+  wAccuracy: number;
   time: number;
-  ca: number;
+  cAccuracy: number;
   createdAt: Date;
   updatedAt: Date;
 }
