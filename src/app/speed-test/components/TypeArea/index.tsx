@@ -5,7 +5,7 @@ import { GrPowerReset } from "react-icons/gr";
 import { caculScore, getWord, pushScore } from "./_utils";
 import { Header } from "./Header";
 import { WordList } from "./WordList";
-import { IRank, IResult } from "../../types";
+import { IResult } from "../../types";
 import { useMainStore } from "@/layouts/main.store";
 import { UseQueryResult } from "@tanstack/react-query";
 
@@ -45,7 +45,9 @@ export default function TypeArea({
   const [prevDebounce, setPrevDebounce] = React.useState("");
   const [failCount, setFailCount] = React.useState(0);
   const [initTime, setInitTime] = React.useState(10);
-  const [time, setTime] = React.useState(type === "countDown" ? initTime : 0);
+  const [time, setTime] = React.useState(
+    timeType === "countDown" ? initTime : 0
+  );
   const [isNextWord, setIsNextWord] = React.useState(false);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
@@ -55,11 +57,11 @@ export default function TypeArea({
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setTime((prev) => {
-        if (type === "countDown" && !prev) {
+        if (timeType === "countDown" && !prev) {
           if (intervalRef.current) clearInterval(intervalRef.current);
           return 0;
         } else {
-          return type === "countDown" ? prev - 1 : prev + 1;
+          return timeType === "countDown" ? prev - 1 : prev + 1;
         }
       });
     }, 1000);
@@ -112,7 +114,7 @@ export default function TypeArea({
 
   const Reset = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    setTime(type === "countDown" ? initTime : 0);
+    setTime(timeType === "countDown" ? initTime : 0);
     setTypingWord("");
     setParagraphs("");
     setUserInput("");
@@ -136,12 +138,12 @@ export default function TypeArea({
   }, [isReset]);
 
   React.useEffect(() => {
-    if (type === "countDown") {
+    if (timeType === "countDown") {
       if (isTyping && !time) {
         finishType();
       }
     }
-  }, [time, type]);
+  }, [time, timeType]);
 
   React.useEffect(() => {
     if (!isFinish) {
@@ -183,7 +185,7 @@ export default function TypeArea({
   }, [wordIndex]);
 
   React.useEffect(() => {
-    setTime(type === "countDown" ? initTime : 0);
+    setTime(timeType === "countDown" ? initTime : 0);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);

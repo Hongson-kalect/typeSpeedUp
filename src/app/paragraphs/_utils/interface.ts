@@ -54,6 +54,10 @@ export type ParaInfoType = {
   updatedAt: string;
   novelId: string;
   novel: NovelInfoType;
+  isLiked: boolean;
+  isFavorited: boolean;
+  likeCount: number;
+  favoriteCount: number;
 };
 
 export type NovelInfoType = {
